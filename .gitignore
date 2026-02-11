@@ -1,3 +1,27 @@
-#add venv and data
+# --- Python ---
 .venv/
+#venv/
+#ENV/
+#__pycache__/
+#*.py[cod]
+#.pytest_cache/
+
+# --- Environnement / Secrets ---
+.env
+#.flaskenv
+
+# --- Docker & Bases de données ---
+# On ignore les dossiers de données pour ne pas pousser 2Go de DB sur GitHub
 data/
+*.db
+
+# --- Logs & Monitoring ---
+#logs/
+#*.log
+#prometheus_data/
+#grafana_data/
+
+# --- OS / IDE ---
+#.DS_Store
+#.vscode/
+#.idea/
