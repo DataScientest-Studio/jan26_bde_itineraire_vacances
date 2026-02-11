@@ -1,9 +1,9 @@
 services:
   mongodb:
     image : mongo:7.0
-    container_name: mongo_tourisme
     env_file:
       - .env
+    container_name: ${MONGO_CONTAINER_NAME}
     restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
