@@ -44,6 +44,7 @@ def ingest_data():
             headers = {
                 'X-API-Key': os.getenv("DATA_TOURISME_API_KEY")
             }
+            print(url)
             response = requests.get(url, headers=headers)
     
             # 1. Vérifie si le code est 200, sinon lève une HTTPError
@@ -79,7 +80,7 @@ def ingest_data():
                 print(f"Batch traité - Insérés/MAJ : {res.upserted_count + res.modified_count}")
 
             # Pagination : passage à l'URL suivante fournie par l'API 
-            url = response.get("meta", {}).get("next")
+            url = data.get("meta", {}).get("next")
 
         except requests.exceptions.HTTPError as http_err:
             # Erreur spécifique au protocole HTTP (ex: 401 Unauthorized)
