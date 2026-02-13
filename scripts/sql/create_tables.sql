@@ -7,14 +7,14 @@ CREATE TABLE IF NOT EXISTS type (
 -- 2. Table principale POI
 CREATE TABLE IF NOT EXISTS poi (
     uuid UUID PRIMARY KEY,
-    label VARCHAR(255) NOT NULL,
+    label TEXT NOT NULL,
     description TEXT,
     shortDescription TEXT,
-    uri VARCHAR(255),
-    legalName VARCHAR(255),
+    uri TEXT,
+    legalName TEXT,
     telephone VARCHAR(50),
     email VARCHAR(255),
-    homepage VARCHAR(255),
+    homepage TEXT,
     lastUpdate DATE,
     lastUpdateDatatourisme TIMESTAMP
 );
@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS poi (
 CREATE TABLE IF NOT EXISTS poiLocation (
     uuid UUID PRIMARY KEY REFERENCES poi(uuid) ON DELETE CASCADE,
     streetAddress TEXT,
-    postalCode VARCHAR(10),
-    postalCodeInsee VARCHAR(10),
-    city VARCHAR(100),
+    postalCode VARCHAR(50),
+    postalCodeInsee VARCHAR(50),
+    city TEXT,
     cityInsee VARCHAR(100),
     latitude FLOAT,
     longitude FLOAT
