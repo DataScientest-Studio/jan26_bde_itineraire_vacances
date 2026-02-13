@@ -44,7 +44,6 @@ def ingest_data():
             headers = {
                 'X-API-Key': os.getenv("DATA_TOURISME_API_KEY")
             }
-            print(url)
             response = requests.get(url, headers=headers)
     
             # 1. Vérifie si le code est 200, sinon lève une HTTPError

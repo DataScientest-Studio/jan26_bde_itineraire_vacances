@@ -18,3 +18,13 @@ const countall = db.getCollection('tourisme_collection').find().count();
 // Print a message to the output window.
 console.log(countall);
 
+console.log(db.getCollection('tourisme_collection').find({ 
+    $where: "this.hasDescription && this.hasDescription.length > 0" 
+}).count())
+
+console.log(db.getCollection('tourisme_collection').find({ 
+    $where: "this.hasDescription && this.hasDescription.length > 1" 
+}).count())
+    
+
+
