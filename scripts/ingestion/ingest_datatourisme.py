@@ -8,10 +8,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_last_update_from_mongo(collection):
-    """Récupère la date de lastUpdate la plus récente pour l'incrémental."""
+    """Récupère la date de lastUpdateDatatourisme la plus récente pour l'incrémental."""
     # On cherche le document avec la date la plus élevée
-    last_doc = collection.find_one(sort=[("lastUpdate", -1)])
-    return last_doc["lastUpdate"] if last_doc else None
+    last_doc = collection.find_one(sort=[("lastUpdateDatatourisme", -1)])
+    return last_doc["lastUpdateDatatourisme"] if last_doc else None
 
 def ingest_data():
     # Connexion MongoDB via les variables d'environnement
@@ -31,11 +31,11 @@ def ingest_data():
     
     if last_date:
         # On reprend à partir de la dernière date connue 
-        url = f"https://api.datatourisme.fr/v1/catalog?sort=lastUpdate&page_size=250&filters=lastUpdate[gte]={last_date}"
+        url = f"https://api.datatourisme.fr/v1/catalog?sort=lastUpdateDatatourisme&page_size=250&filters=lastUpdateDatatourisme[gte]={last_date}"
         print(f"Mode Incrémental : synchronisation depuis le {last_date}")
     else:
         # Premier lancement : on récupère tout 
-        url = "https://api.datatourisme.fr/v1/catalog?sort=lastUpdate&page_size=250"
+        url = "https://api.datatourisme.fr/v1/catalog?sort=lastUpdateDatatourisme&page_size=250"
         print("Mode Initialisation : récupération totale de la base")
 
     # 2. Boucle de traitement des pages de l'API
