@@ -25,10 +25,12 @@ def sync_data():
     # --- ÉTAPE 2 : REQUÊTE MONGO ---
     # .isoformat() transforme un objet datetime Python en string car dans Mongo c'est stocké en String
     query = {"lastUpdateDatatourisme": {"$gt": last_sync.isoformat()}}
+    # Compte le nombre de documents correspondant au filtre
+    total_to_process = collection.count_documents(query)
     
     # On trie par date pour que si le script s'arrête, on ait traité les plus anciens d'abord.
     mongo_cursor = collection.find(query).sort("lastUpdateDatatourisme", 1)#.limit(10000) #⚠️ A ENLEVER APRES LES TESTS
-
+    print(f"🔄 Synchronisation en cours... {total_to_process} documents à traiter depuis le {last_sync.date()}.")
     # --- ÉTAPE 3 : PRÉPARATION DES BATCHS ---
     #On choisi des batchs de 1000 pour aller plus vite, et pas trop pour ne pas saturer la mémoire.
     batch_size = 1000

@@ -1,53 +1,71 @@
-Project Name
-==============================
+# Itinéraire de Vacances
 
-This project is a starting Pack for MLOps projects based on the subject "movie_recommandation". It's not perfect so feel free to make some modifications on it.
+Ce projet est un pipeline de données conçu pour collecter, traiter et stocker des informations touristiques provenant de la source de données "datatourisme". Il utilise une architecture basée sur des conteneurs Docker pour gérer les bases de données (MongoDB, PostgreSQL) et des scripts Python pour orchestrer le flux de données.
 
-Project Organization
-------------
+## Prérequis
 
-    ├── LICENSE
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── logs               <- Logs from training and predicting
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   ├── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │   │   └── visualize.py
-    │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
+Avant de commencer, assurez-vous d'avoir installé les outils suivants sur votre machine :
+*   [Docker](https://www.docker.com/get-started)
+*   [Docker Compose](https://docs.docker.com/compose/install/)
+*   [Python 3.9+](https://www.python.org/downloads/)
 
---------
+## Installation et Configuration
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+Suivez ces étapes pour mettre en place votre environnement de développement local.
+
+1.  **Cloner le dépôt :**
+    ```bash
+    git clone <URL_DU_DEPOT>
+    cd <NOM_DU_DOSSIER_PROJET>
+    ```
+
+2.  **Configurer les Variables d'Environnement :**
+    Le projet utilise un fichier `.env` pour gérer les configurations sensibles (clés d'API, mots de passe, etc.).
+    
+    Copiez le fichier d'exemple pour créer votre propre configuration :
+    ```bash
+    cp .env.example .env
+    ```
+    Ouvrez ensuite le fichier `.env` et **modifiez les variables**, notamment en ajoutant votre propre clé d'API pour `DATA_TOURISME_API_KEY`.
+
+3.  **Lancer les Services Docker :**
+    Démarrez les conteneurs des bases de données (MongoDB, PostgreSQL) et de l'outil d'administration (pgAdmin) en arrière-plan :
+    ```bash
+    docker-compose up -d
+    ```
+
+4.  **Mettre en Place l'Environnement Python :**
+    Il est recommandé d'utiliser un environnement virtuel pour isoler les dépendances du projet.
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+    *Sur Windows, l'activation se fait avec : `.venv\Scripts\activate`*
+
+5.  **Installer les Dépendances Python :**
+    Installez toutes les bibliothèques nécessaires listées dans `requirements.txt`.
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## Utilisation
+
+Une fois l'installation terminée, vous pouvez utiliser les scripts pour interagir avec les données.
+
+1.  **Ingestion des Données :**
+    Pour récupérer les données de la source "datatourisme" et les stocker dans MongoDB.
+    ```bash
+    python scripts/ingestion/ingest_datatourisme.py
+    ```
+
+2.  **Traitement et Transfert des Données :**
+    Pour traiter les données depuis MongoDB et les transférer vers PostgreSQL.
+    ```bash
+    python scripts/processing/mongo_to_postgres.py
+    ```
+
+## Accès aux Outils
+
+*   **pgAdmin** : Accessible via `http://localhost:5050` (ou le port que vous avez défini dans votre `.env`).
+*   **MongoDB** : Accessible sur `localhost:27017` (ou le port défini).
+*   **PostgreSQL** : Accessible sur `localhost:5432` (ou le port défini).

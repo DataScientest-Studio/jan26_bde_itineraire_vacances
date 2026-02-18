@@ -45,11 +45,13 @@ def analyze_deep_schema(sample_size=10000):
     print("-" * 65)
 
     # Trier par fréquence
+    # 
     for key, count in key_counter.most_common():
         percentage = (count / limit) * 100
-        if percentage > 10: # On affiche uniquement ce qui est significatif
+        if percentage > 5: # On affiche uniquement ce qui est significatif
             print(f"{key[:48]:<50} | {percentage:>8.1f}%")
 
 if __name__ == "__main__":
     # analyze_deep_schema(sample_size=10000)
-    analyze_deep_schema(sample_size=None) # Pour analyser tout, mais ça peut être long selon la taille de la collection
+    analyze_deep_schema(sample_size=None) 
+    # Pour analyser tout, mais ça peut être long selon la taille de la collection
