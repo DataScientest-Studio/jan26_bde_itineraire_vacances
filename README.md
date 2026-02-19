@@ -89,6 +89,7 @@ Voici un aperçu de la structure du projet et de l'objectif de chaque dossier :
 │   ├── processing/     # Scripts pour nettoyer, transformer et transférer les données.
 │   ├── sql/            # Fichiers SQL, notamment pour la création des schémas de base de données.
 │   └── utils/          # Fonctions utilitaires partagées par les autres scripts.
+│   └── maintenance/    # Supprimer/recréer les DB
 ├── .env.example  # Fichier d'exemple pour les variables d'environnement.
 ├── docker-compose.yml # Fichier de configuration pour lancer les services avec Docker Compose.
 └── requirements.txt   # Liste des dépendances Python du projet.
