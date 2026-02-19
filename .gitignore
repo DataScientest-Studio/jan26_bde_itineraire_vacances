@@ -12,7 +12,10 @@ __pycache__/
 
 # --- Docker & Bases de données ---
 # On ignore les dossiers de données pour ne pas pousser 2Go de DB sur GitHub
-data/
+data/mongo/
+data/neo4j/
+data/postgres
+
 *.db
 
 # --- Logs & Monitoring ---

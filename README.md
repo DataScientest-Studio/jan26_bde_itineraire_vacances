@@ -69,3 +69,27 @@ Une fois l'installation terminée, vous pouvez utiliser les scripts pour interag
 *   **pgAdmin** : Accessible via `http://localhost:5050` (ou le port que vous avez défini dans votre `.env`).
 *   **MongoDB** : Accessible sur `localhost:27017` (ou le port défini).
 *   **PostgreSQL** : Accessible sur `localhost:5432` (ou le port défini).
+
+## Structure du Projet
+
+Voici un aperçu de la structure du projet et de l'objectif de chaque dossier :
+
+```
+.
+├── .github/      # Contient les workflows d'intégration continue (CI/CD) avec GitHub Actions.
+├── api/          # (Prévu) Code source de l'API qui exposera les données.
+├── dashboard/    # (Prévu) Fichiers de configuration pour les tableaux de bord (ex: Streamlit, Dash).
+├── data/         # Contient les volumes des bases de données persistantes (MongoDB, Neo4j, PostgreSQL).
+├── deploy/       # Scripts et configurations pour le déploiement.
+├── ml/           # (Prévu) Code pour les modèles de Machine Learning.
+├── notebooks/    # Contient des notebooks Jupyter pour l'exploration et l'analyse de données.
+├── scripts/      # Scripts Python pour l'ingestion, le traitement et l'analyse des données.
+│   ├── analysis/       # Scripts pour analyser les données.
+│   ├── ingestion/      # Scripts pour importer les données depuis des sources externes.
+│   ├── processing/     # Scripts pour nettoyer, transformer et transférer les données.
+│   ├── sql/            # Fichiers SQL, notamment pour la création des schémas de base de données.
+│   └── utils/          # Fonctions utilitaires partagées par les autres scripts.
+├── .env.example  # Fichier d'exemple pour les variables d'environnement.
+├── docker-compose.yml # Fichier de configuration pour lancer les services avec Docker Compose.
+└── requirements.txt   # Liste des dépendances Python du projet.
+```
