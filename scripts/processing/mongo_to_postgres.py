@@ -36,6 +36,7 @@ def sync_data():
     batch_size = 1000
     poi_batch = []
     loc_batch = []
+    city_batch = {} # Dictionnaire pour éviter les doublons dans le batch
     # Accumulateur pour stocker les types du batch en cours afin de les traiter après l'insert POI
     type_accumulator = []
 
@@ -44,7 +45,6 @@ def sync_data():
         uuid = doc.get('uuid')
         try:
 
-            # Extraction sécurisée des objets listes
             # Extraction sécurisée des objets listes
             descs = doc.get('hasDescription')
             contacts = doc.get('hasContact')
@@ -100,6 +100,17 @@ def sync_data():
             # Préparation des données Localisation
             loc = doc.get('isLocatedAt', [{}])[0]
             addr = loc.get('address', [{}])[0]
+            city_insee = addr.get('hasAddressCity', {}).get('insee')
+
+            # Si on a un code INSEE, on prépare la ville
+            if city_insee:
+                city_batch[city_insee] = (
+                    city_insee,
+                    addr.get('postalCode'),
+                    addr.get('addressLocality'), # city label
+                    addr.get('hasAddressCity', {}).get('label', {}).get('@fr') # cityInsee label
+                )
+
             # On récupère la liste des rues
             street_list = addr.get('streetAddress', [])
             # On les joint avec une virgule si la liste n'est pas vide, sinon None
@@ -108,10 +119,7 @@ def sync_data():
             loc_batch.append((
                 uuid,
                 full_street,
-                addr.get('postalCode'),
-                addr.get('hasAddressCity', {}).get('insee'),
-                addr.get('addressLocality'),
-                addr.get('hasAddressCity', {}).get('label', {}).get('@fr'),
+                city_insee, # Foreign Key vers la table city
                 loc.get('geo', {}).get('latitude'),
                 loc.get('geo', {}).get('longitude')
             ))
@@ -126,9 +134,9 @@ def sync_data():
             # --- ÉTAPE 5 : ENVOI DES BATCHS ---
             if len(poi_batch) >= batch_size:
                 # On appelle la fonction d'orchestration pour respecter l'ordre des Foreign Keys
-                execute_sequenced_batch(cursor, poi_batch, loc_batch, type_accumulator)
+                execute_sequenced_batch(cursor,list(city_batch.values()), poi_batch, loc_batch, type_accumulator)
                 pg_conn.commit() # On valide la transaction
-                poi_batch, loc_batch, type_accumulator = [], [], []
+                poi_batch, loc_batch, type_accumulator, city_batch = [], [], [], {}
                 print(f"Sync : {batch_size} nouveaux documents traités.")
 
         except AttributeError as e:
@@ -147,19 +155,25 @@ def sync_data():
 
     # On n'oublie pas le dernier batch incomplet
     if poi_batch:
-        execute_sequenced_batch(cursor, poi_batch, loc_batch, type_accumulator)
+        execute_sequenced_batch(cursor, list(city_batch.values()),poi_batch, loc_batch, type_accumulator)
         pg_conn.commit()
 
     cursor.close()
     pg_conn.close()
 
-def execute_sequenced_batch(cursor, poi_data, loc_data, type_data):
-    """Effectue l'insertion de masse en respectant l'ordre hiérarchique des tables."""
+def execute_sequenced_batch(cursor, city_data, poi_data, loc_data, type_data):
+    """Effectue l'insertion de masse en respectant l'ordre hiérarchique."""
     
-    # --- INSERTION TABLE POI (PARENT) ---
-    # ON CONFLICT (uuid) DO UPDATE : C'est le 'Upsert'.
-    # Si l'UUID existe déjà, Postgres met à jour les colonnes listées après SET.
-    # EXCLUDED représente la nouvelle valeur qu'on essaye d'insérer.
+    # --- INSERTION TABLE CITY ---
+    if city_data:
+        city_query = """
+            INSERT INTO city (postalCodeInsee, postalCode, city, cityInsee)
+            VALUES %s
+            ON CONFLICT (postalCodeInsee) DO NOTHING;
+        """
+        extras.execute_values(cursor, city_query, city_data)
+
+    # --- INSERTION TABLE POI ---
     poi_query = """
         INSERT INTO poi (uuid, label, description, shortDescription, uri, legalName, telephone, email, homepage, lastUpdate, lastUpdateDatatourisme)
         VALUES %s
@@ -177,16 +191,14 @@ def execute_sequenced_batch(cursor, poi_data, loc_data, type_data):
     """
     extras.execute_values(cursor, poi_query, poi_data)
 
-    # --- INSERTION TABLE LOCATION (ENFANT) ---
+    # --- 3. INSERTION TABLE LOCATION (Enfant de POI et CITY) ---
+    # Attention : la query SQL doit correspondre à tes 5 colonnes de poiLocation
     loc_query = """
-        INSERT INTO poiLocation (uuid, streetAddress, postalCode, postalCodeInsee, city, cityInsee, latitude, longitude)
+        INSERT INTO poiLocation (uuid, streetAddress, postalCodeInsee, latitude, longitude)
         VALUES %s
         ON CONFLICT (uuid) DO UPDATE SET
             streetAddress = EXCLUDED.streetAddress,
-            postalCode = EXCLUDED.postalCode,
             postalCodeInsee = EXCLUDED.postalCodeInsee,
-            city = EXCLUDED.city,
-            cityInsee = EXCLUDED.cityInsee,
             latitude = EXCLUDED.latitude,
             longitude = EXCLUDED.longitude;
     """
