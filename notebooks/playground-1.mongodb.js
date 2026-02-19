@@ -12,19 +12,11 @@
 // Select the database to use.
 use('mongo_tourisme_db');
 
-// Run a find command to view items sold on April 4th, 2014.
-const countall = db.getCollection('tourisme_collection').find().count();
 
-// Print a message to the output window.
-console.log(countall);
-
-console.log(db.getCollection('tourisme_collection').find({ 
-    $where: "this.hasDescription && this.hasDescription.length > 0" 
-}).count())
-
-console.log(db.getCollection('tourisme_collection').find({ 
-    $where: "this.hasDescription && this.hasDescription.length > 1" 
-}).count())
+db.getCollection('tourisme_collection').aggregate([
+  { $project: { typeCount: { $cond: { if: { $isArray: "$type" }, then: { $size: "$type" }, else: 0 } } } },
+  { $group: { _id: null, totalTypesAcrossAllDocs: { $sum: "$typeCount" } } }
+])
     
 
 
