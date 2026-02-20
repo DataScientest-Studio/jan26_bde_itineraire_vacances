@@ -62,5 +62,6 @@ INSERT INTO theme (themeId, themeLabel) VALUES
 (2, 'Sportif'),
 (3, 'Détente & bien-être'),
 (4, 'Familial'),
-(5, 'Culturel')
+(5, 'Culturel'),
+(6, 'Autre')
 ON CONFLICT (themeId) DO NOTHING;
