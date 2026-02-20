@@ -65,6 +65,10 @@ def predict_all_themes():
             FROM poi p
             LEFT JOIN poiType pt ON p.uuid = pt.uuid
             LEFT JOIN type t ON pt.typeId = t.typeId
+            -- On ajoute un LEFT JOIN vers la table des thèmes
+            LEFT JOIN poiTheme pth ON p.uuid = pth.uuid
+            -- On ne garde que les POI qui n'ont PAS de correspondance dans poiTheme
+            WHERE pth.uuid IS NULL
             GROUP BY p.uuid, p.label, p.description, p.shortdescription
             LIMIT %s OFFSET %s;
         """
