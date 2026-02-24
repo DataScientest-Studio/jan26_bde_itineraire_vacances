@@ -94,3 +94,15 @@ Voici un aperçu de la structure du projet et de l'objectif de chaque dossier :
 ├── docker-compose.yml # Fichier de configuration pour lancer les services avec Docker Compose.
 └── requirements.txt   # Liste des dépendances Python du projet.
 ```
+
+creation api fastapi:
+pip install fastapi uvicorn (FastAPI → framework pour créer l’API,Uvicorn → serveur ASGI pour lancer l’application)
+lancer srv: uvicorn main:app_iv --reload
+running on: http://127.0.0.1:8000
+doc swagger: http://127.0.0.1:8000/docs
+pip install fastapi uvicorn python-jose passlib[bcrypt] (python-jose → création/validation du JWT, passlib[bcrypt] → hash sécurisé des mots de passe)
+bearer associé à admin
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTgwMzQ3MDE4MH0.i7CqDbcbsjUYYcOxiNfFMlEWOzajP6ddWuDI-vX_pkU",
+  "token_type": "bearer"
+}
