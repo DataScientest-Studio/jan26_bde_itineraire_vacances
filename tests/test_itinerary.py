@@ -4,7 +4,7 @@ test_itinerary.py
 Teste la génération d’un itinéraire et affiche les distances entre étapes.
 """
 
-from itinerary_builder import ItineraryBuilder
+from neo4j.itinerary.itinerary_builder import ItineraryBuilder
 from neo4j import GraphDatabase
 
 # ---------------------------------------------------------
