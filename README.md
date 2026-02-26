@@ -95,14 +95,25 @@ Voici un aperçu de la structure du projet et de l'objectif de chaque dossier :
 └── requirements.txt   # Liste des dépendances Python du projet.
 ```
 
-creation api fastapi:
-pip install fastapi uvicorn (FastAPI → framework pour créer l’API,Uvicorn → serveur ASGI pour lancer l’application)
-lancer srv: uvicorn main:app_iv --reload
-running on: http://127.0.0.1:8000
-doc swagger: http://127.0.0.1:8000/docs
-pip install fastapi uvicorn python-jose passlib[bcrypt] (python-jose → création/validation du JWT, passlib[bcrypt] → hash sécurisé des mots de passe)
-bearer associé à admin
+#api fastapi
+requirements.txt mis à jour pour fastapi
+main.py dans répertoire "...\scripts\api" du repo
+lancement depuis la racine du repo (là où se trouve le ".env"): "uvicorn scripts.api.main:app_iv --reload"
+
+une fois lancée, le root de l'api est ici: http://127.0.0.1:8000
+doc swagger api: http://127.0.0.1:8000/docs
+
+token bearer associé à admin à utiliser pour authentification:
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTgwMzQ3MDE4MH0.i7CqDbcbsjUYYcOxiNfFMlEWOzajP6ddWuDI-vX_pkU",
   "token_type": "bearer"
 }
+La gestion des token reste à préciser pour la suite, temporaire?, permanent?, sans token car utilisation interne?
+Quelques variables dont le token seront mises dans .env du projet.
+
+Endpoints existant à ce jour:
+http://127.0.0.1:8000/users/me : renvoie le users/me
+http://127.0.0.1:8000/internal : renvoie un message mais deviendra le endpoint appelé par ux
+http://127.0.0.1:8000/cities : renvoie la liste des villes de la table city par ordre alphabétique
+
+
