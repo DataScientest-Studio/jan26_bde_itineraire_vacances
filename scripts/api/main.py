@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
 from typing import Optional
-
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
+from scripts.utils.db_connect import get_pg_conn
+import json
+from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
 
 #Configuration
 SECRET_KEY = "supersecretkey"
@@ -90,3 +93,18 @@ def read_users_me(current_user: dict = Depends(get_current_user)):
 @app_iv.get("/internal")
 def api_response(current_user: dict = Depends(get_current_user)):
     return {"message": "Bienvenue sur API itinéraire_vacances 🚀"}
+    
+@app_iv.get("/cities")
+def api_response(current_user: dict = Depends(get_current_user)):
+    conn = get_pg_conn()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("SELECT city FROM city ORDER BY city ASC;")
+
+    rows = cursor.fetchall()
+    
+    json_data = json.dumps(rows, indent=2)
+    	
+    cursor.close()
+    conn.close()
+    return rows
