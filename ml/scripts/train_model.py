@@ -36,6 +36,7 @@ def clean_text(text):
 
 def train_model():
     # --- PRÉPARATION DES MOTS VIDES (STOP WORDS) ---
+    # EXtrait C/C au lieu d'utilisaer une librairie car je n'ai pas réussi.
     FRENCH_STOP_WORDS = [
         "a", "au", "aux", "avec", "ce", "ces", "dans", "de", "des", "du", "elle", "en", "et", "eux", 
         "il", "je", "la", "le", "leur", "lui", "ma", "mais", "me", "même", "mes", "moi", "mon", 
@@ -73,7 +74,7 @@ def train_model():
     # --- ÉTAPE 2 : SÉPARATION DES DONNÉES (SPLIT) ---
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, 
-        test_size=0.2, 
+        test_size=0.2, #seulement 20% pour le test, vu la taille limitée du dataset
         random_state=42, 
         stratify=y # Important pour garder l'équilibre des classes
     )
