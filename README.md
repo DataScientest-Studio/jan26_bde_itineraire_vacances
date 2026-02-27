@@ -57,11 +57,18 @@ Une fois l'installation terminée, vous pouvez utiliser les scripts pour interag
     ```bash
     python scripts/ingestion/ingest_datatourisme.py
     ```
+    > **Note :** L'API `datatourisme` limite le nombre d'appels. Lors de la première exécution complète, il est possible que le script s'interrompe. Il faudra alors attendre environ 1 heure avant de le relancer pour terminer l'ingestion, ou configurer une seconde clé d'API dans le code.
 
 2.  **Traitement et Transfert des Données :**
     Pour traiter les données depuis MongoDB et les transférer vers PostgreSQL.
     ```bash
     python scripts/processing/mongo_to_postgres.py
+    ```
+
+3.  **Catégorisation des POIs (Machine Learning) :**
+    Lancer la prédiction des thèmes des points d'intérêt (POIs).
+    ```bash
+    python ml/scripts/predict_all_pois.py
     ```
 
 ## Accès aux Outils
@@ -76,23 +83,29 @@ Voici un aperçu de la structure du projet et de l'objectif de chaque dossier :
 
 ```
 .
-├── .github/      # Contient les workflows d'intégration continue (CI/CD) avec GitHub Actions.
-├── api/          # (Prévu) Code source de l'API qui exposera les données.
-├── dashboard/    # (Prévu) Fichiers de configuration pour les tableaux de bord (ex: Streamlit, Dash).
-├── data/         # Contient les volumes des bases de données persistantes (MongoDB, Neo4j, PostgreSQL).
-├── deploy/       # Scripts et configurations pour le déploiement.
-├── ml/           # (Prévu) Code pour les modèles de Machine Learning.
-├── notebooks/    # Contient des notebooks Jupyter pour l'exploration et l'analyse de données.
-├── scripts/      # Scripts Python pour l'ingestion, le traitement et l'analyse des données.
-│   ├── analysis/       # Scripts pour analyser les données.
-│   ├── ingestion/      # Scripts pour importer les données depuis des sources externes.
-│   ├── processing/     # Scripts pour nettoyer, transformer et transférer les données.
-│   ├── sql/            # Fichiers SQL, notamment pour la création des schémas de base de données.
-│   └── utils/          # Fonctions utilitaires partagées par les autres scripts.
-│   └── maintenance/    # Supprimer/recréer les DB
-├── .env.example  # Fichier d'exemple pour les variables d'environnement.
-├── docker-compose.yml # Fichier de configuration pour lancer les services avec Docker Compose.
-└── requirements.txt   # Liste des dépendances Python du projet.
+├── .github/        # Contient les workflows d'intégration continue (CI/CD).
+├── dashboard/      # Contient l'application dashboard (Streamlit, Dash...).
+├── data/           # Volumes des bases de données persistantes (gérés par Docker).
+├── deploy/         # Scripts et configurations pour le déploiement.
+├── ml/             # Code pour les modèles de Machine Learning.
+│   ├── data/       # Données pour l'entraînement et la prédiction.
+│   ├── models/     # Modèles de ML entraînés.
+│   └── scripts/    # Scripts pour l'entraînement et la prédiction.
+├── notebooks/      # Notebooks Jupyter pour l'exploration et l'analyse.
+├── scripts/        # Scripts Python pour l'ingestion, le traitement, l'API, etc.
+│   ├── analysis/   # Scripts pour analyser les données.
+│   ├── api/        # Code source de l'API FastAPI qui expose les données.
+│   ├── ingestion/  # Scripts pour importer les données depuis des sources externes.
+│   ├── maintenance/# Scripts pour la maintenance des BDD (reset, setup).
+│   ├── processing/ # Scripts pour nettoyer, transformer et transférer les données.
+│   ├── sql/        # Fichiers SQL (création de schémas de BDD).
+│   └── utils/      # Fonctions utilitaires partagées.
+├── .env.example    # Fichier d'exemple pour les variables d'environnement.
+├── .gitignore      # Fichiers et dossiers ignorés par Git.
+├── docker-compose.yml # Fichier de configuration pour les services Docker.
+├── LICENSE         # Licence du projet.
+├── requirements.txt # Liste des dépendances Python.
+└── script_streamlit.py # Script pour un dashboard Streamlit.
 ```
 
 #api fastapi

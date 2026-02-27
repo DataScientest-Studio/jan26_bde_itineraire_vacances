@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from scripts.utils.db_connect import get_pg_conn
 
-# --- CONFIGURATION ---
+# On ignore tous ces types car ils ne sont pas intelligibles
 TYPES_TO_IGNORE = [
     "PointOfInterest", "PlaceOfInterest", "LocalBusiness", "Product", "ServiceProvider", 
     "Organization", "Agent", "CivicStructure", "BusinessPlace", "ConvenientService",
@@ -25,7 +25,7 @@ TYPES_TO_IGNORE = [
 
 def extract_data_for_ml(limit=100):
     """
-    Extrait les données de Postgres, filtre les types bruyants 
+    Extrait les données de Postgres, filtre les types nok
     et prépare le texte pour la labellisation Gemini.
     """
     conn = get_pg_conn()
@@ -48,14 +48,10 @@ def extract_data_for_ml(limit=100):
     try:
         print(f"📡 Extraction de {limit} échantillons depuis Postgres...")
         df = pd.read_sql(query, conn, params=(limit,))
-        
-        # --- CORRECTIF : Gestion des valeurs NULL/NaN ---
-        # fillna("") transforme les NaN en chaînes vides, permettant l'usage de 'or'
         df = df.fillna("")
 
         def prepare_text(row):
             # 1. Filtrage des types ignorés
-            # On s'assure que row['types'] est une liste (cas où ARRAY_AGG renverrait None malgré le fillna)
             raw_types = row['types'] if isinstance(row['types'], list) else []
             valid_types = [t for t in raw_types if t not in TYPES_TO_IGNORE and t != ""]
             types_str = ", ".join(valid_types)
@@ -64,10 +60,10 @@ def extract_data_for_ml(limit=100):
             # Grâce au fillna(""), si 'description' est vide, Python passe à 'shortdescription'
             description = row['description'] or row['shortdescription'] or ""
             
-            # 3. Construction de la méga-string
+            # 3. Construction de la string
             text = f"NOM: {row['label']} | TYPES: {types_str} | DESC: {description}"
             
-            # Nettoyage final des sauts de ligne pour le format CSV/LLM
+            # Nettoyage final des sauts de ligne pour le format CSV
             return text.replace('\n', ' ').replace('\r', ' ').strip()
 
         print("🪄  Préparation du texte d'entrée...")
@@ -98,5 +94,3 @@ if __name__ == "__main__":
         print(f"✅ Succès ! Fichier sauvegardé : {output_file}")
         print(f"📊 Nombre de lignes : {len(samples)}")
         print("-" * 30)
-        print("Aperçu de la première ligne :")
-        print(samples.iloc[0]['input_text'])
