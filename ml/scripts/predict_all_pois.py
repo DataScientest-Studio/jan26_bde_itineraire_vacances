@@ -6,7 +6,7 @@ import unicodedata
 from psycopg2 import extras
 from scripts.utils.db_connect import get_pg_conn
 
-# --- MÊME CONFIGURATION QUE POUR L'EXTRACTION ---
+# --- MÊME CONFIGURATION QUE POUR L'EXTRACTION --- Liste non intelligible de types à ignorer, identique à get_sample_data.py
 TYPES_TO_IGNORE = [
     "PointOfInterest", "PlaceOfInterest", "LocalBusiness", "Product", "ServiceProvider", 
     "Organization", "Agent", "CivicStructure", "BusinessPlace", "ConvenientService",
@@ -42,7 +42,7 @@ def predict_all_themes():
     # 1. Chargement du Pipeline (qui contient le vectoriseur et le model)
     model_path = "ml/models/poi_theme_classifier.joblib"
     if not os.path.exists(model_path):
-        print("❌ Modèle introuvable. Lancez d'abord train_model.py")
+        print("❌ Modèle introuvable")
         return
     
     pipeline = joblib.load(model_path)
@@ -54,7 +54,7 @@ def predict_all_themes():
     print("🚀 Lancement de l'inférence massive sur les POI...")
 
     while True:
-        # On utilise "shortdescription" en minuscule comme dans ton script d'extraction
+        # On utilise "shortdescription" en minuscule comme dans le script d'extraction
         query = """
             SELECT 
                 p.uuid, 
@@ -85,7 +85,7 @@ def predict_all_themes():
             valid_types = [t for t in raw_types if t not in TYPES_TO_IGNORE and t != ""]
             types_str = ", ".join(valid_types)
             
-            # Priorité Longue > Courte comme dans ton script
+            # Priorité Longue > Courte comme dans le script
             description = row['description'] or row['shortdescription'] or ""
             
             # Formatage exact du texte
