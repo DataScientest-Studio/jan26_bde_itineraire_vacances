@@ -51,10 +51,10 @@ CREATE TABLE IF NOT EXISTS poiType (
 
 -- 7. Table de jointure pour les thèmes (Relation N:N - Alimentée par le ML)
 CREATE TABLE IF NOT EXISTS poiTheme (
-    uuid UUID REFERENCES poi(uuid) ON DELETE CASCADE,
-    themeId INT REFERENCES theme(themeId) ON DELETE CASCADE,
-    PRIMARY KEY (uuid, themeId)
+    uuid UUID PRIMARY KEY REFERENCES poi(uuid) ON DELETE CASCADE,
+    themeId INT REFERENCES theme(themeId) ON DELETE CASCADE
 );
+
 
 -- 8. Insertion des thèmes prédéfinis
 INSERT INTO theme (themeId, themeLabel) VALUES 
@@ -62,5 +62,6 @@ INSERT INTO theme (themeId, themeLabel) VALUES
 (2, 'Sportif'),
 (3, 'Détente & bien-être'),
 (4, 'Familial'),
-(5, 'Culturel')
+(5, 'Culturel'),
+(6, 'Autre')
 ON CONFLICT (themeId) DO NOTHING;
