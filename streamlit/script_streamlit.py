@@ -7,6 +7,37 @@ from datetime import date
 import os
 
 
+
+# CONNEXION API & CACHE 3H
+@st.cache_data(ttl=10800) # 10800 secondes = 3 heures
+def get_cities_auto():
+    try:
+        # Obtenir le Token
+        token_url = "http://api:8000/token"
+        auth_data = {"username": "admin", "password": "Pwd_iv_26!@"}
+        resp_token = requests.post(token_url, data=auth_data, timeout=3)
+        
+        if resp_token.status_code == 200:
+            token = resp_token.json().get("access_token")
+            
+            # Recuperation des villes
+            cities_url = "http://api:8000/cities"
+            headers = {"Authorization": f"Bearer {token}"}
+            resp_cities = requests.get(cities_url, headers=headers, timeout=3)
+            
+            if resp_cities.status_code == 200:
+                rows = resp_cities.json()
+                return [r["city"] for r in rows] # On garde juste les noms
+                
+    except:
+        pass # ignore les erreurs silencieusement si l'API est éteinte
+        
+    # Liste de secours
+    return ["Paris", "Bordeaux", "Lyon", "Marseille", "Biarritz"]
+
+
+
+
 # Choix de structure et d'interface :
 # 1. CONFIGURATION CENTRÉE : paramètres pour générer l'itinéraire de voyage
 #       1) Recherche géographique : par 'ville' (endpoint API pour suggestions de villes)
@@ -40,7 +71,7 @@ if 'max_step' not in st.session_state:
 # --- (Juste avant le code de la Sidebar) ---
 st.session_state.max_step = max(st.session_state.max_step, st.session_state.step)
 
-# 2. SIDEBAR : menu de navigation + indicateurs d'étapes visuels + bouton de réinitialisation
+# 2. SIDEBAR : menu de navigation + indicateurs d'etapes + bouton de réinitialisation
 with st.sidebar:
     st.title("Sommaire")
     st.write("---")
@@ -164,17 +195,20 @@ st.write("Planifiez votre itinéraire de voyage en seulement quelques clics...")
 
 
 # --- ÉTAPE 1 : DESTINATION --- "Ville" (input text + suggestions auto-complétion)
-
 # Label "Étape 1"
 st.markdown('<p style="color:#FF4500; font-weight:800; font-size:1.2rem; margin-bottom:0;">ÉTAPE 1</p>', unsafe_allow_html=True)
 st.subheader("Choisissez votre destination :material/location_on:")
 st.write("Indiquez la ville que vous souhaitez explorer :")
 
-# Champ de saisie
-ville_temp = st.text_input(
+# Appel de la fonction (Instantané grâce au cache)
+villes_db = get_cities_auto()
+
+# Autocomplétion avec Selectbox (Affiche les suggestions au fur et à mesure de la frappe)
+ville_temp = st.selectbox(
     "Destination", 
-    value=st.session_state.ville, 
-    placeholder="Ex: Bordeaux, Biarritz...", 
+    options=villes_db,
+    index=None,
+    placeholder="Commencez à taper (ex: Paris...)",
     label_visibility="collapsed"
 )
 
@@ -183,14 +217,14 @@ alerte_ville = st.empty()
 st.write("##")
 
 if st.button("Suivant :material/arrow_forward:", key="btn_etape1", type="primary"):
-    if ville_temp.strip() == "":
-        # Injecte la bulle jaune dans l'espace réservé plus haut !
-        alerte_ville.warning("Veuillez indiquer une ville avant de passer à l'étape suivante. ⚠️")
+    if not ville_temp:
+        alerte_ville.warning("Veuillez choisir une ville avant de passer à la suite. ⚠️")
     else:
-        # Enregistrement et Automation
         st.session_state.ville = ville_temp
         st.session_state.step = 2
         st.rerun()
+
+
 
 # --- VERROUILLAGE (Le reste n'apparaît que si step >= 2) ---
 if st.session_state.step >= 2:
@@ -205,7 +239,7 @@ if st.session_state.step >= 2:
         )
     
     
-    # --- ÉTAPE 2 : DURÉE SÉJOUR --- Slider pour sélectionner la durée du séjour (1 à 7 jours)
+    # --- ETAPE 2 : DURÉE SEJOUR --- Slider pour selectionner la duree du séjour (1 à 7 jours)
     st.markdown('<p style="color:#FF4500; font-weight:800; font-size:1.2rem; margin-bottom:0;"> ÉTAPE 2</p>', unsafe_allow_html=True)
     st.subheader("Combien de temps souhaitez-vous partir ?")
     st.write("Indiquez le nombre de jours de votre voyage :")
