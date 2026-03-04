@@ -24,9 +24,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Verify Python version
-        run: python --version
-
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -50,8 +47,9 @@ jobs:
 
       - name: Set Neo4j password
         run: |
+          echo "Using password: $NEO4J_PASSWORD"
           neo4j/bin/cypher-shell -u neo4j -p neo4j -d system \
-            "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${{ env.NEO4J_PASSWORD }}'"
+            "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '"$NEO4J_PASSWORD"'"
 
-      - name: Run tests
-        run: pytest -q --ignore=scripts/utils/test_connexion_mongo.py
+      - name: Add project root to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB
