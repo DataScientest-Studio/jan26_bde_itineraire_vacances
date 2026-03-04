@@ -25,6 +25,27 @@ data/postgres
 #grafana_data/
 
 # --- OS / IDE ---
-#.DS_Store
-#.vscode/
-#.idea/
+.DS_Store
+.vscode/
+.idea/
+
+# Spyder
+.spyproject/
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
+
+# exclude data from source control by default
+/data/
+
+# vim
+*.swp
+*.swo
+
+# Mypy cache
+.mypy_cache/
+
+# Artefacts de tests unitaires
+itinerary_export.json
+paris_nature_test.json
+
