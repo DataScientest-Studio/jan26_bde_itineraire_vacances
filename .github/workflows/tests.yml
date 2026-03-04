@@ -62,7 +62,7 @@ jobs:
 
       - name: Set Neo4j password
         run: |
-          neo4j/bin/cypher-shell -u neo4j -p neo4j "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${NEO4J_PASSWORD}'"
+          neo4j/bin/cypher-shell -u neo4j -p neo4j -d system "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${NEO4J_PASSWORD}'"
 
       - name: Test Neo4j connection
         run: python neo4j_module/test_connections.py
