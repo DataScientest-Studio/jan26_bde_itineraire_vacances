@@ -69,16 +69,13 @@ def main():
 
     city = sys.argv[1]
 
-    pre = PrecomputeDistances(
-        "bolt://localhost:7687",
-        "neo4j",
-        "Nassima94!!"
-    )
+    pre = PrecomputeDistances()  # <-- correction ici
 
     pre.compute_city_distances(city)
     pre.close()
 
     print(f"Précalcul des distances NEAR terminé pour {city}.")
+
 
 
 if __name__ == "__main__":

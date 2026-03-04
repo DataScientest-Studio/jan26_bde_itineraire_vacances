@@ -60,11 +60,7 @@ def main():
     city = sys.argv[1]
     json_file = sys.argv[2]
 
-    importer = CityPOIImporter(
-        "bolt://localhost:7687",
-        "neo4j",
-        "Nassima94!!"
-    )
+    importer = CityPOIImporter()  # <-- correction ici
 
     pois = importer.load_pois(json_file)
     print(f"Import de {len(pois)} POI pour la ville : {city}")
@@ -73,6 +69,7 @@ def main():
     importer.close()
 
     print("Import terminé.")
+
 
 
 if __name__ == "__main__":
