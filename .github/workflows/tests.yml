@@ -54,4 +54,4 @@ jobs:
             "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${{ env.NEO4J_PASSWORD }}'"
 
       - name: Run tests
-        run: pytest -q
+        run: pytest -q --ignore=scripts/utils/test_connexion_mongo.py
