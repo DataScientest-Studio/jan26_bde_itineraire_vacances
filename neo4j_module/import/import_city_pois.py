@@ -1,6 +1,7 @@
 from neo4j import GraphDatabase
 import json
 import sys
+import os
 from neo4j_module.config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 class CityPOIImporter:
