@@ -58,9 +58,13 @@ def main():
         return
 
     city = sys.argv[1]
-    json_file = sys.argv[2]
+    relative_json_path = sys.argv[2]
 
-    importer = CityPOIImporter()  # <-- correction ici
+    # Construire un chemin ABSOLU vers le fichier JSON
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    json_file = os.path.join(BASE_DIR, relative_json_path)
+
+    importer = CityPOIImporter()
 
     pois = importer.load_pois(json_file)
     print(f"Import de {len(pois)} POI pour la ville : {city}")
@@ -69,6 +73,7 @@ def main():
     importer.close()
 
     print("Import terminé.")
+
 
 
 
