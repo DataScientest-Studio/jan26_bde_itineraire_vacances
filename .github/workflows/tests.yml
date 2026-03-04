@@ -52,4 +52,4 @@ jobs:
             "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '"$NEO4J_PASSWORD"'"
 
       - name: Add project root to PYTHONPATH
-        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
