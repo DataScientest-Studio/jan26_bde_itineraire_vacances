@@ -12,7 +12,7 @@ fastapi==0.133.0
 h11==0.16.0
 idna==3.11
 joblib==1.5.3
-numpy==2.4.2
+numpy>=1.26,<2.0
 pandas==3.0.1
 passlib==1.7.4
 psycopg2-binary==2.9.11
