@@ -87,3 +87,7 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
+#artefact de tests unitaires
+itinerary_export.json
+paris_nature_test.json
