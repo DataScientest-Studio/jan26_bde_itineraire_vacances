@@ -1,0 +1,143 @@
+[
+    {
+        "poi_id": "LIM001",
+        "label": "Place de la République",
+        "lat": 43.0543,
+        "lon": 2.2187,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM002",
+        "label": "Musée Petiet",
+        "lat": 43.0548,
+        "lon": 2.2182,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM003",
+        "label": "Pont Vieux de Limoux",
+        "lat": 43.0535,
+        "lon": 2.2195,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM004",
+        "label": "Basilique Notre-Dame de Marceille",
+        "lat": 43.0427,
+        "lon": 2.2220,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM005",
+        "label": "Musée du Piano",
+        "lat": 43.0541,
+        "lon": 2.2190,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM006",
+        "label": "Carnaval de Limoux – Halle aux Grains",
+        "lat": 43.0546,
+        "lon": 2.2184,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM007",
+        "label": "Maison Guinot – Caves de Blanquette",
+        "lat": 43.0567,
+        "lon": 2.2155,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM008",
+        "label": "Église Saint-Martin",
+        "lat": 43.0549,
+        "lon": 2.2198,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM009",
+        "label": "Pont Neuf",
+        "lat": 43.0538,
+        "lon": 2.2203,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LIM010",
+        "label": "Maison de la Blanquette",
+        "lat": 43.0552,
+        "lon": 2.2179,
+        "themes": ["Culturel"]
+    },
+
+    {
+        "poi_id": "LIM011",
+        "label": "Bords de l'Aude – Promenade",
+        "lat": 43.0530,
+        "lon": 2.2210,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM012",
+        "label": "Jardin de la Mairie",
+        "lat": 43.0544,
+        "lon": 2.2180,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM013",
+        "label": "Parc du Tivoli",
+        "lat": 43.0560,
+        "lon": 2.2160,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM014",
+        "label": "Sentier du Belvédère",
+        "lat": 43.0490,
+        "lon": 2.2250,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM015",
+        "label": "Chemin des Vignes",
+        "lat": 43.0580,
+        "lon": 2.2140,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM016",
+        "label": "Parc de l'Aiguille",
+        "lat": 43.0600,
+        "lon": 2.2100,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM017",
+        "label": "Sentier du Pic de Brau",
+        "lat": 43.0300,
+        "lon": 2.2400,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM018",
+        "label": "Rives de l'Aude – Zone Sud",
+        "lat": 43.0500,
+        "lon": 2.2230,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM019",
+        "label": "Parc de la Petite Vitesse",
+        "lat": 43.0570,
+        "lon": 2.2170,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LIM020",
+        "label": "Sentier du Confluent",
+        "lat": 43.0480,
+        "lon": 2.2300,
+        "themes": ["Nature"]
+    }
+]

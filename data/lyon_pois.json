@@ -1,0 +1,143 @@
+[
+    {
+        "poi_id": "LYO001",
+        "label": "Basilique Notre-Dame de Fourvière",
+        "lat": 45.7622,
+        "lon": 4.8224,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO002",
+        "label": "Musée des Confluences",
+        "lat": 45.7335,
+        "lon": 4.8195,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO003",
+        "label": "Cathédrale Saint-Jean",
+        "lat": 45.7600,
+        "lon": 4.8270,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO004",
+        "label": "Opéra de Lyon",
+        "lat": 45.7674,
+        "lon": 4.8361,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO005",
+        "label": "Musée des Beaux-Arts",
+        "lat": 45.7673,
+        "lon": 4.8340,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO006",
+        "label": "Théâtre Gallo-Romain",
+        "lat": 45.7608,
+        "lon": 4.8219,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO007",
+        "label": "Musée Gadagne",
+        "lat": 45.7640,
+        "lon": 4.8278,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO008",
+        "label": "Hôtel de Ville de Lyon",
+        "lat": 45.7670,
+        "lon": 4.8345,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO009",
+        "label": "Place Bellecour",
+        "lat": 45.7578,
+        "lon": 4.8320,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "LYO010",
+        "label": "Musée Lumière",
+        "lat": 45.7450,
+        "lon": 4.8720,
+        "themes": ["Culturel"]
+    },
+
+    {
+        "poi_id": "LYO011",
+        "label": "Parc de la Tête d'Or",
+        "lat": 45.7797,
+        "lon": 4.8534,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO012",
+        "label": "Berges du Rhône",
+        "lat": 45.7600,
+        "lon": 4.8400,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO013",
+        "label": "Parc des Hauteurs",
+        "lat": 45.7625,
+        "lon": 4.8210,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO014",
+        "label": "Jardin du Rosaire",
+        "lat": 45.7620,
+        "lon": 4.8230,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO015",
+        "label": "Parc Blandan",
+        "lat": 45.7480,
+        "lon": 4.8590,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO016",
+        "label": "Île Barbe",
+        "lat": 45.7960,
+        "lon": 4.8270,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO017",
+        "label": "Parc de Gerland",
+        "lat": 45.7290,
+        "lon": 4.8230,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO018",
+        "label": "Jardin des Chartreux",
+        "lat": 45.7700,
+        "lon": 4.8270,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO019",
+        "label": "Parc du Vallon",
+        "lat": 45.7830,
+        "lon": 4.8000,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "LYO020",
+        "label": "Berges de Saône – Promenade",
+        "lat": 45.7700,
+        "lon": 4.8200,
+        "themes": ["Nature"]
+    }
+]

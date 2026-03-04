@@ -1,0 +1,143 @@
+[
+    {
+        "poi_id": "PAR001",
+        "label": "Musée du Louvre",
+        "lat": 48.8606,
+        "lon": 2.3376,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR002",
+        "label": "Cathédrale Notre-Dame",
+        "lat": 48.852968,
+        "lon": 2.349902,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR003",
+        "label": "Tour Eiffel",
+        "lat": 48.8584,
+        "lon": 2.2945,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR004",
+        "label": "Arc de Triomphe",
+        "lat": 48.8738,
+        "lon": 2.2950,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR005",
+        "label": "Musée d'Orsay",
+        "lat": 48.8600,
+        "lon": 2.3266,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR006",
+        "label": "Panthéon",
+        "lat": 48.8462,
+        "lon": 2.3459,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR007",
+        "label": "Opéra Garnier",
+        "lat": 48.8719,
+        "lon": 2.3316,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR008",
+        "label": "Centre Pompidou",
+        "lat": 48.8606,
+        "lon": 2.3522,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR009",
+        "label": "Musée Rodin",
+        "lat": 48.8556,
+        "lon": 2.3151,
+        "themes": ["Culturel"]
+    },
+    {
+        "poi_id": "PAR010",
+        "label": "Sainte-Chapelle",
+        "lat": 48.8554,
+        "lon": 2.3450,
+        "themes": ["Culturel"]
+    },
+
+    {
+        "poi_id": "PAR011",
+        "label": "Jardin du Luxembourg",
+        "lat": 48.8462,
+        "lon": 2.3372,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR012",
+        "label": "Jardin des Tuileries",
+        "lat": 48.8635,
+        "lon": 2.3270,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR013",
+        "label": "Parc Monceau",
+        "lat": 48.8790,
+        "lon": 2.3095,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR014",
+        "label": "Parc des Buttes-Chaumont",
+        "lat": 48.8809,
+        "lon": 2.3817,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR015",
+        "label": "Bois de Vincennes",
+        "lat": 48.8283,
+        "lon": 2.4350,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR016",
+        "label": "Bois de Boulogne",
+        "lat": 48.8638,
+        "lon": 2.2493,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR017",
+        "label": "Parc André Citroën",
+        "lat": 48.8401,
+        "lon": 2.2750,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR018",
+        "label": "Jardin des Plantes",
+        "lat": 48.8430,
+        "lon": 2.3580,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR019",
+        "label": "Parc de la Villette",
+        "lat": 48.8898,
+        "lon": 2.3930,
+        "themes": ["Nature"]
+    },
+    {
+        "poi_id": "PAR020",
+        "label": "Square du Vert-Galant",
+        "lat": 48.8574,
+        "lon": 2.3410,
+        "themes": ["Nature"]
+    }
+]
