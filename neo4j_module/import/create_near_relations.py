@@ -1,8 +1,5 @@
 from neo4j import GraphDatabase
-
-NEO4J_URI = "bolt://localhost:7687"
-NEO4J_USER = "neo4j"
-NEO4J_PASSWORD = "Nassima94!!"
+from neo4j_module.config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 MAX_DISTANCE_METERS = 2000  # rayon raisonnable pour un itinéraire urbain
 

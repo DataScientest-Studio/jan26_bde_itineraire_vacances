@@ -1,12 +1,15 @@
 from neo4j import GraphDatabase
 import json
 import sys
-
+from neo4j_module.config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 class CityPOIImporter:
 
-    def __init__(self, uri, user, password):
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
+    def __init__(self): 
+        self.driver = GraphDatabase.driver(
+            NEO4J_URI, 
+            auth=(NEO4J_USER, NEO4J_PASSWORD) 
+            )
 
     def close(self):
         self.driver.close()

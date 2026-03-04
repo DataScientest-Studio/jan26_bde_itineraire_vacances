@@ -1,0 +1,83 @@
+name: Tests Neo4j + Pytest
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      # Variables Neo4j utilisées par config.py
+      NEO4J_URI: bolt://localhost:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: test123
+
+    steps:
+      # ---------------------------------------------------------
+      # 1) Récupération du code
+      # ---------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------
+      # 2) Installation Python + dépendances
+      # ---------------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ---------------------------------------------------------
+      # 3) Installation Neo4j Community Edition
+      # ---------------------------------------------------------
+      - name: Install Neo4j
+        run: |
+          wget -O neo4j.tar.gz https://dist.neo4j.org/neo4j-community-5.20.0-unix.tar.gz
+          tar -xzf neo4j.tar.gz
+          mv neo4j-community-* neo4j
+
+      # ---------------------------------------------------------
+      # 4) Configuration du mot de passe Neo4j
+      # ---------------------------------------------------------
+      - name: Configure Neo4j password
+        run: |
+          sed -i 's/#dbms.default_listen_address=0.0.0.0/dbms.default_listen_address=0.0.0.0/' neo4j/conf/neo4j.conf
+          sed -i 's/#dbms.security.auth_enabled=true/dbms.security.auth_enabled=true/' neo4j/conf/neo4j.conf
+
+      # ---------------------------------------------------------
+      # 5) Lancement de Neo4j
+      # ---------------------------------------------------------
+      - name: Start Neo4j
+        run: |
+          neo4j/bin/neo4j start
+          sleep 20
+
+      # ---------------------------------------------------------
+      # 6) Initialisation du mot de passe Neo4j
+      # ---------------------------------------------------------
+      - name: Set Neo4j password
+        run: |
+          neo4j/bin/cypher-shell -u neo4j -p neo4j "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${NEO4J_PASSWORD}'"
+
+      # ---------------------------------------------------------
+      # 7) Vérification de la connexion Neo4j
+      # ---------------------------------------------------------
+      - name: Test Neo4j connection
+        run: |
+          python neo4j_module/test_connections.py
+
+      # ---------------------------------------------------------
+      # 8) Exécution des tests Pytest
+      # ---------------------------------------------------------
+      - name: Run tests
+        run: |
+          pytest -q

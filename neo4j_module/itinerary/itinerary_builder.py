@@ -1,15 +1,15 @@
 from neo4j import GraphDatabase
 import json
 import os
-
+from neo4j_module.config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 class ItineraryBuilder:
 
     def __init__(self):
-        self.driver = GraphDatabase.driver(
-            "bolt://localhost:7687",
-            auth=("neo4j", "Nassima94!!")
-        )
+        self.driver = GraphDatabase.driver( 
+            NEO4J_URI, 
+            auth=(NEO4J_USER, NEO4J_PASSWORD) 
+            )
 
     # ---------------------------------------------------------
     # Distance entre deux POI via Neo4j (point + distance)
