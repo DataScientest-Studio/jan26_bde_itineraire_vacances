@@ -16,15 +16,9 @@ jobs:
       NEO4J_PASSWORD: adminadmin
 
     steps:
-      # ---------------------------------------------------------
-      # 1) Checkout
-      # ---------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ---------------------------------------------------------
-      # 2) Forcer Python 3.11 AVANT toute installation
-      # ---------------------------------------------------------
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -33,17 +27,11 @@ jobs:
       - name: Verify Python version
         run: python --version
 
-      # ---------------------------------------------------------
-      # 3) Installer les dépendances Python
-      # ---------------------------------------------------------
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ---------------------------------------------------------
-      # 4) Installer Neo4j
-      # ---------------------------------------------------------
       - name: Install Neo4j
         run: |
           wget -O neo4j.tar.gz https://dist.neo4j.org/neo4j-community-5.20.0-unix.tar.gz
@@ -62,10 +50,12 @@ jobs:
 
       - name: Set Neo4j password
         run: |
-          neo4j/bin/cypher-shell -u neo4j -p neo4j -d system "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${{ env.NEO4J_PASSWORD }}'"
+          neo4j/bin/cypher-shell -u neo4j -p neo4j -d system \
+            "ALTER CURRENT USER SET PASSWORD FROM 'neo4j' TO '${{ env.NEO4J_PASSWORD }}'"
 
       - name: Test Neo4j connection
         run: python neo4j_module/test_connections.py
 
       - name: Run tests
         run: pytest -q
+
