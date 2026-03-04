@@ -39,3 +39,4 @@ urllib3==2.6.3
 
 neo4j==5.17.0
 uvicorn==0.41.0
+pytest
