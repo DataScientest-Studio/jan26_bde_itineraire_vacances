@@ -45,6 +45,19 @@ services:
     networks:
       - tourisme_network
 
+  streamlit:
+    build:
+      context: ./streamlit
+      dockerfile: Dockerfile
+    container_name: streamlit
+    ports:
+      - "8501:8501"
+    depends_on:
+      - mongodb
+      - db_postgres
+    networks:
+      - tourisme_network
+
 networks:
   tourisme_network:
     driver: bridge
