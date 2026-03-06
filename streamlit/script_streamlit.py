@@ -9,7 +9,7 @@ import os
 
 
 # CONNEXION API & CACHE 3H
-@st.cache_data(ttl=10800) # 10800 secondes = 3 heures
+@st.cache_data(ttl=10800)
 def get_cities_auto():
     try:
         # Obtenir le Token
