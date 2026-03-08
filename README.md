@@ -55,20 +55,20 @@ Une fois l'installation terminée, vous pouvez utiliser les scripts pour interag
 1.  **Ingestion des Données :**
     Pour récupérer les données de la source "datatourisme" et les stocker dans MongoDB.
     ```bash
-    python scripts/ingestion/ingest_datatourisme.py
+    python -m api.scripts.ingestion.ingest_datatourisme
     ```
     > **Note :** L'API `datatourisme` limite le nombre d'appels. Lors de la première exécution complète, il est possible que le script s'interrompe. Il faudra alors attendre environ 1 heure avant de le relancer pour terminer l'ingestion, ou configurer une seconde clé d'API dans le code.
 
 2.  **Traitement et Transfert des Données :**
     Pour traiter les données depuis MongoDB et les transférer vers PostgreSQL.
     ```bash
-    python scripts/processing/mongo_to_postgres.py
+    python -m api.scripts.processing.mongo_to_postgres
     ```
 
 3.  **Catégorisation des POIs (Machine Learning) :**
     Lancer la prédiction des thèmes des points d'intérêt (POIs).
     ```bash
-    python ml/scripts/predict_all_pois.py
+    python -m api.scripts.ml.predict_all_pois
     ```
 
 ## Accès aux Outils

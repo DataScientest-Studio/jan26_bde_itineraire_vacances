@@ -1,4 +1,4 @@
-from scripts.utils.db_connect import get_pg_conn
+from ..utils.db_connect import get_pg_conn
 
 def setup_tables():
     conn = get_pg_conn()

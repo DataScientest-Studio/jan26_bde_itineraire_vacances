@@ -1,11 +1,10 @@
 import os
 import requests
-from pymongo import MongoClient, ReplaceOne
-from dotenv import load_dotenv
-#from datetime import datetime, timedelta
+from pymongo import ReplaceOne
+from ..utils.db_connect import get_mongo_client
 
-# Charge les variables du fichier .env
-load_dotenv()
+
+
 
 def get_last_update_from_mongo(collection):
     """Récupère la date de lastUpdateDatatourisme la plus récente pour l'incrémental."""
@@ -15,16 +14,7 @@ def get_last_update_from_mongo(collection):
 
 def ingest_data():
     # Connexion MongoDB via les variables d'environnement
-    client = MongoClient(
-        host=os.getenv("MONGO_HOST"),
-        port=int(os.getenv("MONGO_PORT")),
-        username=os.getenv("MONGO_INITDB_ROOT_USERNAME"),
-        password=os.getenv("MONGO_INITDB_ROOT_PASSWORD")
-    )
-    
-    # Utilisation de tes variables pour la DB et la Collection
-    db = client[os.getenv("MONGO_DB_NAME")]
-    collection = db[os.getenv("MONGO_COLLECTION_NAME")]
+    collection = get_mongo_client()
 
     # 1. Détermination de la date de départ (Incrémental)
     last_date = get_last_update_from_mongo(collection)

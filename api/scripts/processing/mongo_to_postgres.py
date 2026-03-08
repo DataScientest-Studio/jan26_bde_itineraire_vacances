@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from psycopg2 import extras
-from scripts.utils.db_connect import get_mongo_client, get_pg_conn
+from ..utils.db_connect import get_mongo_client, get_pg_conn
 
 # --- MÉMOIRE CACHE GLOBALE ---
 # Utilisé pour ne pas solliciter Postgres sur les types déjà connus
