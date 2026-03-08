@@ -1,4 +1,4 @@
-from scripts.utils.db_connect import get_pg_conn
+from ..utils.db_connect import get_pg_conn
 
 def reset_postgres():
     print("⚠️  AVERTISSEMENT : Vous allez supprimer toutes les données de PostgreSQL.")

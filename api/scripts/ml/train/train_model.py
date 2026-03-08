@@ -54,7 +54,7 @@ def train_model():
     ]
     
     # --- ÉTAPE 1 : CHARGEMENT ET NETTOYAGE DES DONNÉES ---
-    file_path = "ml/data/final_training_set.csv"
+    file_path = "data/ml/final_training_set.csv"
     if not os.path.exists(file_path):
         print(f"❌ Erreur : Le fichier {file_path} est introuvable.")
         return
@@ -108,7 +108,7 @@ def train_model():
 
     # --- ÉTAPE 6 : SAUVEGARDE ---
     # On sauvegarde le pipeline entier : il contient les StopWords et la logique de vectorisation
-    model_dir = "ml/models"
+    model_dir = "api/scripts/ml/models"
     os.makedirs(model_dir, exist_ok=True)
     model_path = os.path.join(model_dir, "poi_theme_classifier.joblib")
     

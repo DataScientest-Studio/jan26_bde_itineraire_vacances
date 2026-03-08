@@ -1,7 +1,7 @@
 import os
 import requests
 from pymongo import ReplaceOne
-from scripts.utils.db_connect import get_mongo_client
+from ..utils.db_connect import get_mongo_client
 
 
 
