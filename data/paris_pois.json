@@ -1,11 +1,11 @@
 [
   {
-   	"poi_id": "LYON002",
-	"label": "Église Saint-Germain-l'Auxerrois",
-	"lat": 48.852968,
-	"lon": 2.349902,
-	"themes": [
-		"Culturel"
-	]	
+    "poi_id": "paris_1",
+    "label": "POI Paris",
+    "name": "Point d'intérêt Paris",
+    "category": "culturel",
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "themes": ["Culture", "Nature"]
   }
 ]

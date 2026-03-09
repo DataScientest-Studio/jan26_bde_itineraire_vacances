@@ -1,12 +1,13 @@
 [
- {
-	"poi_id": "LIM002",
-	"label": "Cathédrale Notre-Dame",
-	"lat": 48.852968,
-	"lon": 2.349902,
-	"themes": [
-		"Culturel"
-	]
+  {
+    "poi_id": "limoux_1",
+    "label": "POI Limoux",
+    "name": "Point d'intérêt Limoux",
+    "category": "culturel",
+    "latitude": 43.0544,
+    "longitude": 2.2217,
+    "themes": ["Culture", "Nature"]
   }
 ]
+
 
