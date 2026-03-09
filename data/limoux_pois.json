@@ -1,6 +1,7 @@
 [
   {
     "poi_id": "limoux_1",
+	"label": "POI Limoux",
     "name": "Point d'intérêt Limoux",
     "category": "culturel",
     "latitude": 43.0544,

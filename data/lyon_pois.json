@@ -1,6 +1,7 @@
 [
   {
     "poi_id": "lyon_1",
+	"label": "POI Lyon",
     "name": "Point d'intérêt Lyon",
     "category": "culturel",
     "latitude": 45.7640,

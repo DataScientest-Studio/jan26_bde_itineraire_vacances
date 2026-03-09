@@ -1,6 +1,7 @@
 [
   {
     "poi_id": "paris_1",
+	"label": "POI Paris",
     "name": "Point d'intérêt Paris",
     "category": "culturel",
     "latitude": 48.8566,
