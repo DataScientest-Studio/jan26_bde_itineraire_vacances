@@ -48,13 +48,11 @@ services:
 #  streamlit:
 #    build:
 #      context: ./streamlit
-#      dockerfile: Dockerfile
 #    container_name: streamlit
 #    ports:
 #      - "8501:8501"
 #    depends_on:
-#      - mongodb
-#      - db_postgres
+#      - api
 #    networks:
 #      - tourisme_network
 
