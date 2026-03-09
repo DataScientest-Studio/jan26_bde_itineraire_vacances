@@ -1,15 +1,12 @@
 [
  {
-    "poi_id": "poi_010",
-    "label": "Église Saint-Germain-l'Auxerrois",
-    "lat": 48.8593,
-    "lon": 2.3410,
-    "short_description": "Église gothique proche du Louvre.",
-    "type": "Church",
-    "theme": "Culturel",
-    "city_id": "Lyon",
-    "city_name": "Lyon",
-    "postal_code": "49001",
-    "insee_code": "49101"
+	"poi_id": "LYON002",
+	"label": "Église Saint-Germain-l'Auxerrois",
+	"lat": 48.852968,
+	"lon": 2.349902,
+	"themes": [
+		"Culturel"
+		]
   }
 ]
+

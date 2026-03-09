@@ -1,15 +1,11 @@
 [
   {
-    "poi_id": "poi_002",
-    "label": "Jardin des Tuileries",
-    "lat": 48.8635,
-    "lon": 2.3270,
-    "short_description": "Grand jardin entre le Louvre et la Concorde.",
-    "type": "Park",
-    "theme": "Culturel",
-    "city_id": "paris_75001",
-    "city_name": "Paris",
-    "postal_code": "75001",
-    "insee_code": "75101"
+   	"poi_id": "LYON002",
+	"label": "Église Saint-Germain-l'Auxerrois",
+	"lat": 48.852968,
+	"lon": 2.349902,
+	"themes": [
+		"Culturel"
+	]	
   }
 ]

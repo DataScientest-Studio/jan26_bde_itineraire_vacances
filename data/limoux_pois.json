@@ -1,16 +1,12 @@
 [
  {
-    "poi_id": "poi_006",
-    "label": "Église Saint-Germain-l'Auxerrois",
-    "lat": 48.8593,
-    "lon": 2.3410,
-    "short_description": "Église gothique proche du Louvre.",
-    "type": "Church",
-    "theme": "Culturel",
-    "city_id": "paris_75001",
-    "city_name": "Paris",
-    "postal_code": "75001",
-    "insee_code": "75101"
+	"poi_id": "LIM002",
+	"label": "Cathédrale Notre-Dame",
+	"lat": 48.852968,
+	"lon": 2.349902,
+	"themes": [
+		"Culturel"
+	]
   }
 ]
 
