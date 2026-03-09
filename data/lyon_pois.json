@@ -1,10 +1,15 @@
 [
-  {
-    "poi_id": "lyon_1",
-	"label": "POI Lyon",
-    "name": "Point d'intérêt Lyon",
-    "category": "culturel",
-    "latitude": 45.7640,
-    "longitude": 4.8357
+ {
+    "poi_id": "poi_010",
+    "label": "Église Saint-Germain-l'Auxerrois",
+    "lat": 48.8593,
+    "lon": 2.3410,
+    "short_description": "Église gothique proche du Louvre.",
+    "type": "Church",
+    "theme": "Culturel",
+    "city_id": "Lyon",
+    "city_name": "Lyon",
+    "postal_code": "49001",
+    "insee_code": "49101"
   }
 ]

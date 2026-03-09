@@ -1,11 +1,16 @@
 [
-  {
-    "poi_id": "limoux_1",
-	"label": "POI Limoux",
-    "name": "Point d'intérêt Limoux",
-    "category": "culturel",
-    "latitude": 43.0544,
-    "longitude": 2.2217
+ {
+    "poi_id": "poi_006",
+    "label": "Église Saint-Germain-l'Auxerrois",
+    "lat": 48.8593,
+    "lon": 2.3410,
+    "short_description": "Église gothique proche du Louvre.",
+    "type": "Church",
+    "theme": "Culturel",
+    "city_id": "paris_75001",
+    "city_name": "Paris",
+    "postal_code": "75001",
+    "insee_code": "75101"
   }
 ]
 
