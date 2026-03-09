@@ -1,0 +1,15 @@
+[
+  {"poi_id": "lyon_c_1", "label": "POI Lyon Culturel 1", "name": "POI Lyon Culturel 1", "category": "culturel", "lat": 45.7640, "lon": 4.8357, "themes": ["Culturel"], "city": "Lyon"},
+  {"poi_id": "lyon_c_2", "label": "POI Lyon Culturel 2", "name": "POI Lyon Culturel 2", "category": "culturel", "lat": 45.7641, "lon": 4.8358, "themes": ["Culturel"], "city": "Lyon"},
+  {"poi_id": "lyon_c_3", "label": "POI Lyon Culturel 3", "name": "POI Lyon Culturel 3", "category": "culturel", "lat": 45.7642, "lon": 4.8359, "themes": ["Culturel"], "city": "Lyon"},
+  {"poi_id": "lyon_c_4", "label": "POI Lyon Culturel 4", "name": "POI Lyon Culturel 4", "category": "culturel", "lat": 45.7643, "lon": 4.8360, "themes": ["Culturel"], "city": "Lyon"},
+  {"poi_id": "lyon_c_5", "label": "POI Lyon Culturel 5", "name": "POI Lyon Culturel 5", "category": "culturel", "lat": 45.7644, "lon": 4.8361, "themes": ["Culturel"], "city": "Lyon"},
+
+  {"poi_id": "lyon_n_1", "label": "POI Lyon Nature 1", "name": "POI Lyon Nature 1", "category": "nature", "lat": 45.7640, "lon": 4.8357, "themes": ["Nature"], "city": "Lyon"},
+  {"poi_id": "lyon_n_2", "label": "POI Lyon Nature 2", "name": "POI Lyon Nature 2", "category": "nature", "lat": 45.7641, "lon": 4.8358, "themes": ["Nature"], "city": "Lyon"},
+  {"poi_id": "lyon_n_3", "label": "POI Lyon Nature 3", "name": "POI Lyon Nature 3", "category": "nature", "lat": 45.7642, "lon": 4.8359, "themes": ["Nature"], "city": "Lyon"},
+  {"poi_id": "lyon_n_4", "label": "POI Lyon Nature 4", "name": "POI Lyon Nature 4", "category": "nature", "lat": 45.7643, "lon": 4.8360, "themes": ["Nature"], "city": "Lyon"},
+  {"poi_id": "lyon_n_5", "label": "POI Lyon Nature 5", "name": "POI Lyon Nature 5", "category": "nature", "lat": 45.7644, "lon": 4.8361, "themes": ["Nature"], "city": "Lyon"}
+]
+
+

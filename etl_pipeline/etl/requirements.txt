@@ -1,0 +1,8 @@
+pandas
+requests
+sqlalchemy
+pymongo
+neo4j
+python-dotenv
+psycopg2-binary
+tqdm

@@ -1,30 +1,29 @@
 services:
-  mongodb:
-    image : mongo:7.0
-    env_file:
+  fastapi:
+    build: ./app
+    container_name: fastapi_app
+    env_file: 
       - .env
-    container_name: ${MONGO_CONTAINER_NAME}
-    restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - "${MONGO_PORT}:27017"
+      - "8000:8000"
     volumes:
-      - ./data/mongo:/data/db
-    networks:
-      - tourisme_network
-  
-  db_postgres:
+      - ./app:/app
+      - ./data:/data
+      - ./ml:/ml
+    depends_on:
+      - postgres
+      - mongo
+      - neo4j
+
+  postgres:
     image: postgres:15
-    container_name: ${POSTGRES_CONTAINER_NAME}
-    restart: always
+    container_name: postgres_db
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
@@ -33,17 +32,82 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: ${PGADMIN_CONTAINER_NAME}
-    restart: always
+    container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "${PGADMIN_PORT}:80"
+      - "5050:80"
     depends_on:
-      - db_postgres
-    networks:
-      - tourisme_network
+      - postgres
+
+  mongo:
+    image: mongo:6
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j_db
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/password
+    volumes:
+      - neo4jdata:/data
+      - neo4jlogs:/logs
+
+  jupyter:
+    image: jupyter/base-notebook
+    container_name: jupyter_notebooks
+    env_file:
+      - .env
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./ml:/home/jovyan/ml
+    depends_on:
+      - postgres
+      - mongo
+      - neo4j
+
+  etl:
+    build: ./etl
+    container_name: etl_service
+    env_file: 
+      - .env
+    volumes:
+      - ./etl:/etl
+      - ./data:/data
+    depends_on:
+      - postgres
+      - mongo
+      - neo4j
+
+  ml:
+    build: ./ml
+    container_name: ml_service
+    env_file: 
+      - .env
+    volumes:
+      - ./ml:/ml
+      - ./data:/data
+    depends_on:
+      - postgres
+      - mongo
+      - neo4j
+
+volumes:
+  pgdata:
+  mongodata:
+  neo4jdata:
+  neo4jlogs:
 
   streamlit:
     build:

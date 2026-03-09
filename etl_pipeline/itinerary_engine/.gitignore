@@ -1,0 +1,52 @@
+# --- Python ---
+.venv/
+#venv/
+#ENV/
+__pycache__/
+#*.py[cod]
+#.pytest_cache/
+
+# --- Environnement / Secrets ---
+.env
+#.flaskenv
+
+# --- Docker & Bases de données ---
+# On ignore les dossiers de données pour ne pas pousser 2Go de DB sur GitHub
+data/mongo/
+data/neo4j/
+data/postgres
+
+*.db
+
+# --- Logs & Monitoring ---
+#logs/
+#*.log
+#prometheus_data/
+#grafana_data/
+
+# --- OS / IDE ---
+.DS_Store
+.vscode/
+.idea/
+
+# Spyder
+.spyproject/
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
+
+# exclude data from source control by default
+data/*
+!data/*.json
+
+# vim
+*.swp
+*.swo
+
+# Mypy cache
+.mypy_cache/
+
+# Artefacts de tests unitaires
+itinerary_export.json
+paris_nature_test.json
+

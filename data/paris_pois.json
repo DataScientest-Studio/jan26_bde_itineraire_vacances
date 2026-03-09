@@ -1,0 +1,14 @@
+[
+  {"poi_id": "paris_c_1", "label": "POI Paris Culturel 1", "name": "POI Paris Culturel 1", "category": "culturel", "lat": 48.8566, "lon": 2.3522, "themes": ["Culturel"], "city": "Paris"},
+  {"poi_id": "paris_c_2", "label": "POI Paris Culturel 2", "name": "POI Paris Culturel 2", "category": "culturel", "lat": 48.8567, "lon": 2.3523, "themes": ["Culturel"], "city": "Paris"},
+  {"poi_id": "paris_c_3", "label": "POI Paris Culturel 3", "name": "POI Paris Culturel 3", "category": "culturel", "lat": 48.8568, "lon": 2.3524, "themes": ["Culturel"], "city": "Paris"},
+  {"poi_id": "paris_c_4", "label": "POI Paris Culturel 4", "name": "POI Paris Culturel 4", "category": "culturel", "lat": 48.8569, "lon": 2.3525, "themes": ["Culturel"], "city": "Paris"},
+  {"poi_id": "paris_c_5", "label": "POI Paris Culturel 5", "name": "POI Paris Culturel 5", "category": "culturel", "lat": 48.8570, "lon": 2.3526, "themes": ["Culturel"], "city": "Paris"},
+
+  {"poi_id": "paris_n_1", "label": "POI Paris Nature 1", "name": "POI Paris Nature 1", "category": "nature", "lat": 48.8566, "lon": 2.3522, "themes": ["Nature"], "city": "Paris"},
+  {"poi_id": "paris_n_2", "label": "POI Paris Nature 2", "name": "POI Paris Nature 2", "category": "nature", "lat": 48.8567, "lon": 2.3523, "themes": ["Nature"], "city": "Paris"},
+  {"poi_id": "paris_n_3", "label": "POI Paris Nature 3", "name": "POI Paris Nature 3", "category": "nature", "lat": 48.8568, "lon": 2.3524, "themes": ["Nature"], "city": "Paris"},
+  {"poi_id": "paris_n_4", "label": "POI Paris Nature 4", "name": "POI Paris Nature 4", "category": "nature", "lat": 48.8569, "lon": 2.3525, "themes": ["Nature"], "city": "Paris"},
+  {"poi_id": "paris_n_5", "label": "POI Paris Nature 5", "name": "POI Paris Nature 5", "category": "nature", "lat": 48.8570, "lon": 2.3526, "themes": ["Nature"], "city": "Paris"}
+]
+
