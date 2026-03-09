@@ -25,7 +25,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - tourisme_network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -106,3 +109,17 @@ volumes:
   neo4jdata:
   neo4jlogs:
 
+  streamlit:
+    build:
+      context: ./streamlit
+    container_name: streamlit
+    ports:
+      - "8501:8501"
+#    depends_on:
+#      - api
+    networks:
+      - tourisme_network
+
+networks:
+  tourisme_network:
+    driver: bridge

@@ -1,4 +1,4 @@
-from scripts.utils.db_connect import get_mongo_client
+from ..utils.db_connect import get_mongo_client
 
 def reset_mongo():
     print("⚠️  AVERTISSEMENT : Vous allez supprimer TOUTES les bases de données (hors système) de MongoDB.")

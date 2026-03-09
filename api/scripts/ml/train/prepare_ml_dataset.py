@@ -4,9 +4,9 @@ import os
 
 def merge_labels_and_texts():
     # Chemins des fichiers
-    csv_path = "ml/data/samples_to_label.csv"
-    json_path = "ml/data/gemini_classification.json"
-    output_path = "ml/data/final_training_set.csv"
+    csv_path = "data/ml/samples_to_label.csv"
+    json_path = "data/ml/gemini_classification.json"
+    output_path = "data/ml/final_training_set.csv"
 
     # 1. Chargement des données
     if not os.path.exists(csv_path) or not os.path.exists(json_path):

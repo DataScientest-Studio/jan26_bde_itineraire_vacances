@@ -97,3 +97,7 @@ data/
 *.parquet
 *.zip
 *.gz
+# --- OS / IDE ---
+.DS_Store
+#.vscode/
+#.idea/

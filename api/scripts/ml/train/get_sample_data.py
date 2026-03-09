@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from scripts.utils.db_connect import get_pg_conn
+from ...utils.db_connect import get_pg_conn
 
 # On ignore tous ces types car ils ne sont pas intelligibles
 TYPES_TO_IGNORE = [
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     samples = extract_data_for_ml(5000)
     
     if samples is not None:
-        output_file = "ml/data/samples_to_label.csv"
+        output_file = "data/ml/samples_to_label.csv"
         
         # 3. Sauvegarde
         samples.to_csv(output_file, index=False, encoding='utf-8')
