@@ -6,7 +6,8 @@
     "category": "culturel",
     "lat": 48.8566,
     "lon": 2.3522,
-    "themes": ["Culturel"]
+    "themes": ["Culturel"],
+    "city": "Paris"
   },
   {
     "poi_id": "paris_n_1",
@@ -15,6 +16,7 @@
     "category": "nature",
     "lat": 48.8566,
     "lon": 2.3522,
-    "themes": ["Nature"]
+    "themes": ["Nature"],
+    "city": "Paris"
   }
 ]

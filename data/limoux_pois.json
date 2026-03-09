@@ -6,7 +6,8 @@
     "category": "culturel",
     "lat": 43.0544,
     "lon": 2.2217,
-    "themes": ["Culturel"]
+    "themes": ["Culturel"],
+    "city": "Limoux"
   },
   {
     "poi_id": "limoux_n_1",
@@ -15,8 +16,10 @@
     "category": "nature",
     "lat": 43.0544,
     "lon": 2.2217,
-    "themes": ["Nature"]
+    "themes": ["Nature"],
+    "city": "Limoux"
   }
 ]
+
 
 

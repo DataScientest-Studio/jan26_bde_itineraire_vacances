@@ -6,7 +6,8 @@
     "category": "culturel",
     "lat": 45.7640,
     "lon": 4.8357,
-    "themes": ["Culturel"]
+    "themes": ["Culturel"],
+    "city": "Lyon"
   },
   {
     "poi_id": "lyon_n_1",
@@ -15,7 +16,8 @@
     "category": "nature",
     "lat": 45.7640,
     "lon": 4.8357,
-    "themes": ["Nature"]
+    "themes": ["Nature"],
+    "city": "Lyon"
   }
 ]
 
