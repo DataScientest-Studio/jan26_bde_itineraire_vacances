@@ -1,4 +1,5 @@
 from neo4j import GraphDatabase
+import os
 import json
 import sys
 from neo4j_module.config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
