@@ -45,16 +45,16 @@ services:
     networks:
       - tourisme_network
 
-#  streamlit:
-#    build:
-#      context: ./streamlit
-#    container_name: streamlit
-#    ports:
-#      - "8501:8501"
+  streamlit:
+    build:
+      context: ./streamlit
+    container_name: streamlit
+    ports:
+      - "8501:8501"
 #    depends_on:
 #      - api
-#    networks:
-#      - tourisme_network
+    networks:
+      - tourisme_network
 
 networks:
   tourisme_network:
