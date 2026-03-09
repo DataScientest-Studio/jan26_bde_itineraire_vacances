@@ -1,12 +1,21 @@
 [
   {
-    "poi_id": "limoux_1",
-    "label": "POI Limoux",
-    "name": "Point d'intérêt Limoux",
+    "poi_id": "limoux_c_1",
+    "label": "POI Limoux Culturel",
+    "name": "POI Limoux Culturel",
     "category": "culturel",
     "lat": 43.0544,
     "lon": 2.2217,
-    "themes": ["Culture", "Nature"]
+    "themes": ["Culturel"]
+  },
+  {
+    "poi_id": "limoux_n_1",
+    "label": "POI Limoux Nature",
+    "name": "POI Limoux Nature",
+    "category": "nature",
+    "lat": 43.0544,
+    "lon": 2.2217,
+    "themes": ["Nature"]
   }
 ]
 

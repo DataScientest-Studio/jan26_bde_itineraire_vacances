@@ -1,12 +1,22 @@
 [
   {
-    "poi_id": "lyon_1",
-    "label": "POI Lyon",
-    "name": "Point d'intérêt Lyon",
+    "poi_id": "lyon_c_1",
+    "label": "POI Lyon Culturel",
+    "name": "POI Lyon Culturel",
     "category": "culturel",
     "lat": 45.7640,
     "lon": 4.8357,
-    "themes": ["Culture", "Nature"]
+    "themes": ["Culturel"]
+  },
+  {
+    "poi_id": "lyon_n_1",
+    "label": "POI Lyon Nature",
+    "name": "POI Lyon Nature",
+    "category": "nature",
+    "lat": 45.7640,
+    "lon": 4.8357,
+    "themes": ["Nature"]
   }
 ]
+
 

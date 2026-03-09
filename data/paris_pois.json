@@ -1,11 +1,20 @@
 [
   {
-    "poi_id": "paris_1",
-    "label": "POI Paris",
-    "name": "Point d'intérêt Paris",
+    "poi_id": "paris_c_1",
+    "label": "POI Paris Culturel",
+    "name": "POI Paris Culturel",
     "category": "culturel",
     "lat": 48.8566,
     "lon": 2.3522,
-    "themes": ["Culture", "Nature"]
+    "themes": ["Culturel"]
+  },
+  {
+    "poi_id": "paris_n_1",
+    "label": "POI Paris Nature",
+    "name": "POI Paris Nature",
+    "category": "nature",
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "themes": ["Nature"]
   }
 ]
