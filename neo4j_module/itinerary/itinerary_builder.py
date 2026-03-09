@@ -79,7 +79,7 @@ class ItineraryBuilder:
         # 1) Trouver le point de départ
         start_poi = self.find_closest_poi(pois_copy, start_lat, start_lon)
         itinerary.append(start_poi)
-        pois_copy.remove(start_poi)
+        pois_copy = [p for p in pois_copy if p["poi_id"] != start_poi["poi_id"]]
 
         # 2) Construire l'ordre complet des POI
         current = start_poi
@@ -89,7 +89,7 @@ class ItineraryBuilder:
                 key=lambda p: self.get_distance_between(current["poi_id"], p["poi_id"])
             )
             itinerary.append(next_poi)
-            pois_copy.remove(next_poi)
+            pois_copy = [p for p in pois_copy if p["poi_id"] != next_poi["poi_id"]]
             current = next_poi
 
         # 3) Découper en jours
