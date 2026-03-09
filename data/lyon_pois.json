@@ -4,8 +4,8 @@
     "label": "POI Lyon",
     "name": "Point d'intérêt Lyon",
     "category": "culturel",
-    "latitude": 45.7640,
-    "longitude": 4.8357,
+    "lat": 45.7640,
+    "lon": 4.8357,
     "themes": ["Culture", "Nature"]
   }
 ]

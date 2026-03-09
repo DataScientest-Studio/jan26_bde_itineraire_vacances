@@ -4,8 +4,8 @@
     "label": "POI Limoux",
     "name": "Point d'intérêt Limoux",
     "category": "culturel",
-    "latitude": 43.0544,
-    "longitude": 2.2217,
+    "lat": 43.0544,
+    "lon": 2.2217,
     "themes": ["Culture", "Nature"]
   }
 ]
