@@ -1,7 +1,7 @@
 import os
 import requests
 from pymongo import ReplaceOne
-from ..utils.db_connect import get_mongo_client
+from scripts.utils.db_connect import get_mongo_client_api
 
 
 
@@ -14,7 +14,7 @@ def get_last_update_from_mongo(collection):
 
 def ingest_data():
     # Connexion MongoDB via les variables d'environnement
-    collection = get_mongo_client()
+    collection = get_mongo_client_api()
 
     # 1. Détermination de la date de départ (Incrémental)
     last_date = get_last_update_from_mongo(collection)

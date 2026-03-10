@@ -17,6 +17,8 @@ services:
   
   db_postgres:
     image: postgres:15
+    env_file:
+      - .env
     container_name: ${POSTGRES_CONTAINER_NAME}
     restart: always
     environment:
@@ -33,6 +35,8 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
+    env_file:
+      - .env
     container_name: ${PGADMIN_CONTAINER_NAME}
     restart: always
     environment:
@@ -53,6 +57,28 @@ services:
       - "8501:8501"
 #    depends_on:
 #      - api
+    networks:
+      - tourisme_network
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: ${API_CONTAINER_NAME}
+    environment:
+      DB_PG_HOST: db_postgres
+      DB_MDB_HOST: mongodb
+    ports:
+      - "${API_PORT}:8000"
+    depends_on:
+      - mongodb
+      - db_postgres
+    command: >
+      uvicorn main:app_iv
+      --host 0.0.0.0
+      --port 8000
     networks:
       - tourisme_network
 

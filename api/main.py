@@ -1,14 +1,18 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
+import subprocess
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from scripts.utils.db_connect import get_pg_conn
+from scripts.utils.db_connect import get_pg_conn_api
 import json
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
+from pathlib import Path
+import sys
+
 
 #Configuration
 SECRET_KEY = "supersecretkey"
@@ -16,6 +20,20 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 525600
 
 app_iv = FastAPI()
+
+def run_script_1():
+    lock_file = Path("tmp/script_1.lock")
+    script_path = Path("scripts/ingestion/ingest_datatourisme.py")
+
+    if lock_file.exists():
+        print("Script déjà en cours, lancement ignoré")
+        return
+    try:
+        lock_file.touch()  # crée le lock
+        python_executable = sys.executable  # assure le même Python que FastAPI
+        subprocess.Popen([python_executable, str(script_path)])
+    finally:
+        lock_file.unlink(missing_ok=True)  # supprime le lock à la fin
 
 #Hash mot de passe
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -96,15 +114,24 @@ def api_response(current_user: dict = Depends(get_current_user)):
     
 @app_iv.get("/cities")
 def api_response(current_user: dict = Depends(get_current_user)):
-    conn = get_pg_conn()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    try:
+        with get_pg_conn_api() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute("SELECT city FROM city ORDER BY city ASC;")
+                rows = cursor.fetchall()
+                json_data = json.dumps(rows, indent=2)
+                return rows
+    except Exception as e:
+        return {
+            "database": "error",
+            "message": str(e)
+        }
+        
+@app_iv.post("/ppl_batch")
+def api_call(
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user)
+):
+    background_tasks.add_task(run_script_1)
 
-    cursor.execute("SELECT city FROM city ORDER BY city ASC;")
-
-    rows = cursor.fetchall()
-    
-    json_data = json.dumps(rows, indent=2)
-    	
-    cursor.close()
-    conn.close()
-    return rows
+    return {"status": "script 1 started"}
