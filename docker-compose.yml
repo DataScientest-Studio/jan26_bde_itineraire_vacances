@@ -49,6 +49,22 @@ services:
     networks:
       - tourisme_network
 
+  neo4j:
+    image: neo4j:5
+    env_file:
+      - .env
+    container_name: ${MY_NEO4J_CONTAINER_NAME}
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH}
+    volumes:
+      - ./data/neo4j:/data
+      - ./data/neo4j/logs:/logs
+    networks:
+      - tourisme_network
+
   streamlit:
     build:
       context: ./streamlit
