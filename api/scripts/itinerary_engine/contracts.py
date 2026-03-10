@@ -1,12 +1,10 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class ItineraryRequest(BaseModel):
     postal_code_insee: str
     theme: str
     days: int
-    start_lat: float
-    start_lon: float
 
 class POI(BaseModel):
     poi_id: str
@@ -23,6 +21,11 @@ class StepPOI(BaseModel):
     lon: float
     theme: str
     distance_m: int
+    # Nouveaux champs Postgres (Optionnels car certains POIs peuvent ne pas avoir ces infos)
+    address: Optional[str] = None
+    description: Optional[str] = None
+    telephone: Optional[str] = None
+    website: Optional[str] = None
 
 class StepEvent(BaseModel):
     type: str = "event"
