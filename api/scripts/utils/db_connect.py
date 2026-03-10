@@ -2,6 +2,7 @@ import os
 import psycopg2
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from neo4j import GraphDatabase
 
 load_dotenv()
 
@@ -44,3 +45,10 @@ def get_mongo_client_api():
     )
     db = client[os.getenv("MONGO_DB_NAME")]
     return db[os.getenv("MONGO_COLLECTION_NAME")]
+
+def get_neo4j_driver():
+    uri = os.getenv("NEO4J_URI")
+    user = os.getenv("NEO4J_USER")
+    password = os.getenv("NEO4J_PASSWORD")
+
+    return GraphDatabase.driver(uri, auth=(user, password))

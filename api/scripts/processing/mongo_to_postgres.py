@@ -197,9 +197,16 @@ def sync_data():
             telephone, email, homepage = extract_contacts(doc)
 
             # --- POI Data ---
+            # Extraction du label avec gestion du NULL
+            raw_label = doc.get('label', {})
+            # Si raw_label n'est pas un dictionnaire ou s'il n'y a pas de '@fr', on force un espace
+            label_fr = raw_label.get('@fr') if isinstance(raw_label, dict) else None
+            if not label_fr:
+                label_fr = " "
+
             poi_batch.append((
                 uuid, 
-                doc.get('label', {}).get('@fr'),
+                label_fr,
                 long_desc, short_desc,
                 doc.get('uri'),
                 doc.get('hasBeenCreatedBy', {}).get('legalName'),
