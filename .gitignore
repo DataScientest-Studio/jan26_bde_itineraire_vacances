@@ -1,102 +1,29 @@
-# -----------------------------
-# ENVIRONNEMENTS PYTHON
-# -----------------------------
-venv/
-*/venv/
-.env
-.env.local
-.env.*
-*.pyc
+# --- Python ---
+.venv/
+#venv/
+#ENV/
 __pycache__/
-*.pyo
-*.pyd
+#*.py[cod]
+#.pytest_cache/
 
-# -----------------------------
-# FICHIERS SENSIBLES
-# -----------------------------
-*.key
-*.pem
-*.crt
+# --- Environnement / Secrets ---
+.env
+#.flaskenv
+
+# --- Docker & Bases de données ---
+# On ignore les dossiers de données pour ne pas pousser 2Go de DB sur GitHub
+data/mongo/
+data/neo4j/
+data/postgres
+
 *.db
-*.sqlite
-*.sqlite3
 
-# -----------------------------
-# CONFIGURATION LOCALE
-# -----------------------------
-.DS_Store
-.vscode/
-.idea/
-*.swp
+# --- Logs & Monitoring ---
+#logs/
+#*.log
+#prometheus_data/
+#grafana_data/
 
-# -----------------------------
-# LOGS & TEMPORAIRES
-# -----------------------------
-*.log
-logs/
-tmp/
-temp/
-*.tmp
-
-# -----------------------------
-# DOCKER
-# -----------------------------
-docker/data/
-docker/postgres/
-docker/neo4j/
-docker/volumes/
-*.pid
-
-# -----------------------------
-# JUPYTER / NOTEBOOKS
-# -----------------------------
-.ipynb_checkpoints/
-*.ipynb~
-
-# -----------------------------
-# STREAMLIT / DASHBOARD
-# -----------------------------
-.streamlit/
-dashboard/__pycache__/
-
-# -----------------------------
-# TESTS
-# -----------------------------
-.pytest_cache/
-coverage/
-htmlcov/
-
-# -----------------------------
-# BUILD / DIST
-# -----------------------------
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# -----------------------------
-# ITINERARY ENGINE
-# -----------------------------
-itinerary_engine/venv/
-itinerary_engine/.env
-itinerary_engine/.env.local
-
-# -----------------------------
-# ETL PIPELINE
-# -----------------------------
-etl/__pycache__/
-etl/state/*.json
-etl/state/*.tmp
-
-# -----------------------------
-# DATA LOCALE
-# -----------------------------
-data/
-*.csv
-*.json
-*.parquet
-*.zip
-*.gz
 # --- OS / IDE ---
 .DS_Store
 #.vscode/

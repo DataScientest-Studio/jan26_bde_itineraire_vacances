@@ -1,6 +1,0 @@
-pandas
-requests
-sqlalchemy
-pymongo
-neo4j
-python-dotenv
