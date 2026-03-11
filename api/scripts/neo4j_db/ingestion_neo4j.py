@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 import psycopg2.extras
-from scripts.utils.db_connect import get_pg_conn, get_neo4j_driver
+from scripts.utils.db_connect import get_pg_conn_api, get_neo4j_driver
+import os
+
+print(f"ingestion_neo4j STARTED - PID: {os.getpid()}")
 
 BATCH_SIZE = 10000
 
@@ -21,12 +24,10 @@ def chunked(iterable, size):
         yield iterable[i:i + size]
 
 def run_delta_import():
-    pg_conn = get_pg_conn()
+    pg_conn = get_pg_conn_api()
     neo4j_driver = get_neo4j_driver()
-
     try:
         setup_database(neo4j_driver)
-
         # --- 1. HWM (High Water Mark) ---
         with neo4j_driver.session() as session:
             # On récupère les postalcodeinsee existants

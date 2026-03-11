@@ -4,7 +4,9 @@ import os
 import re
 import unicodedata
 from psycopg2 import extras
-from ..utils.db_connect import get_pg_conn
+from scripts.utils.db_connect import get_pg_conn_api
+
+print(f"predict_all_pois STARTED - PID: {os.getpid()}")
 
 # --- MÊME CONFIGURATION QUE POUR L'EXTRACTION --- Liste non intelligible de types à ignorer, identique à get_sample_data.py
 TYPES_TO_IGNORE = [
@@ -40,13 +42,13 @@ def clean_text(text):
 
 def predict_all_themes():
     # 1. Chargement du Pipeline (qui contient le vectoriseur et le model)
-    model_path = "scripts/ml/models/poi_theme_classifier.joblib" #ATTENTION PEUTETRE A REVOIR AVEC LES DOCKER.
+    model_path = "api/scripts/ml/models/poi_theme_classifier.joblib" #ATTENTION PEUTETRE A REVOIR AVEC LES DOCKER.
     if not os.path.exists(model_path):
         print("❌ Modèle introuvable")
         return
     
     pipeline = joblib.load(model_path)
-    conn = get_pg_conn()
+    conn = get_pg_conn_api()
     
     batch_size = 5000
     offset = 0

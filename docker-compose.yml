@@ -49,16 +49,14 @@ services:
     networks:
       - tourisme_network
 
-  neo4j:
+   neo4j:
     image: neo4j:5
-    env_file:
-      - .env
-    container_name: ${MY_NEO4J_CONTAINER_NAME}
+    container_name: neo4j_tourisme
     ports:
       - "7474:7474"
       - "7687:7687"
     environment:
-      NEO4J_AUTH: ${NEO4J_AUTH}
+      NEO4J_AUTH: neo4j/password
     volumes:
       - ./data/neo4j:/data
       - ./data/neo4j/logs:/logs
