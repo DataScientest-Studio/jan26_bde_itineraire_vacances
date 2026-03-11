@@ -1,6 +1,9 @@
+import os
 from datetime import datetime, timedelta
 from psycopg2 import extras
-from ..utils.db_connect import get_mongo_client, get_pg_conn
+from scripts.utils.db_connect import get_mongo_client_api, get_pg_conn_api
+
+print(f"mongo_to_postgres STARTED - PID: {os.getpid()}")
 
 # --- MÉMOIRE CACHE GLOBALE ---
 # Utilisé pour ne pas solliciter Postgres sur les types déjà connus
@@ -169,8 +172,8 @@ def process_batch(cursor, pg_conn, city_batch, poi_batch, loc_batch, type_batch)
     pg_conn.commit()
 
 def sync_data():
-    collection = get_mongo_client()
-    pg_conn = get_pg_conn()
+    collection = get_mongo_client_api()
+    pg_conn = get_pg_conn_api()
     cursor = pg_conn.cursor()
 
     # 1. Setup
@@ -197,16 +200,9 @@ def sync_data():
             telephone, email, homepage = extract_contacts(doc)
 
             # --- POI Data ---
-            # Extraction du label avec gestion du NULL
-            raw_label = doc.get('label', {})
-            # Si raw_label n'est pas un dictionnaire ou s'il n'y a pas de '@fr', on force un espace
-            label_fr = raw_label.get('@fr') if isinstance(raw_label, dict) else None
-            if not label_fr:
-                label_fr = " "
-
             poi_batch.append((
                 uuid, 
-                label_fr,
+                doc.get('label', {}).get('@fr'),
                 long_desc, short_desc,
                 doc.get('uri'),
                 doc.get('hasBeenCreatedBy', {}).get('legalName'),

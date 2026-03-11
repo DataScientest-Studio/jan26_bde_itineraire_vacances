@@ -4,7 +4,7 @@ from pymongo import ReplaceOne
 from scripts.utils.db_connect import get_mongo_client_api
 
 
-
+print(f"ingest_datatourisme STARTED - PID: {os.getpid()}")
 
 def get_last_update_from_mongo(collection):
     """Récupère la date de lastUpdateDatatourisme la plus récente pour l'incrémental."""

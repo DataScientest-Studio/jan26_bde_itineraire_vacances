@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 import subprocess
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -12,7 +13,11 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from pathlib import Path
 import sys
+import psutil
+import asyncio
+import os
 
+load_dotenv()
 
 #Configuration
 SECRET_KEY = "supersecretkey"
@@ -21,19 +26,76 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 525600
 
 app_iv = FastAPI()
 
-def run_script_1():
-    lock_file = Path("tmp/script_1.lock")
+def script_already_running(script_name: str):
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        cmdline = proc.info['cmdline']
+        if cmdline and script_name in " ".join(cmdline):
+            return True
+    return False
+
+async def run_script_1():
     script_path = Path("scripts/ingestion/ingest_datatourisme.py")
 
-    if lock_file.exists():
+    if script_already_running(str(script_path)):
         print("Script déjà en cours, lancement ignoré")
         return
-    try:
-        lock_file.touch()  # crée le lock
-        python_executable = sys.executable  # assure le même Python que FastAPI
-        subprocess.Popen([python_executable, str(script_path)])
-    finally:
-        lock_file.unlink(missing_ok=True)  # supprime le lock à la fin
+
+    python_executable = sys.executable  # assure le même Python que FastAPI
+    process = await asyncio.create_subprocess_exec(
+        python_executable, str(script_path),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await process.communicate()
+    
+    return process.returncode, stdout.decode(), stderr.decode()
+
+async def run_script_2():
+    script_path = Path("scripts/processing/mongo_to_postgres.py")
+
+    if script_already_running(str(script_path)):
+        print("Script déjà en cours, lancement ignoré")
+        return
+
+    python_executable = sys.executable  # assure le même Python que FastAPI
+    process = await asyncio.create_subprocess_exec(
+        python_executable, str(script_path),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await process.communicate()
+    
+    return process.returncode, stdout.decode(), stderr.decode()
+    
+async def run_script_3():
+    script_path = Path("scripts/ml/predict_all_pois.py")
+
+    if script_already_running(str(script_path)):
+        print("Script déjà en cours, lancement ignoré")
+        return
+
+    python_executable = sys.executable  # assure le même Python que FastAPI
+    process = await asyncio.create_subprocess_exec(
+        python_executable, str(script_path),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await process.communicate()
+    
+    return process.returncode, stdout.decode(), stderr.decode()
+
+async def run_script_4():
+    script_path = Path("scripts/neo4j_db/ingestion_neo4j.py")
+
+    if script_already_running(str(script_path)):
+        print("Script déjà en cours, lancement ignoré")
+        return
+
+    python_executable = sys.executable  # assure le même Python que FastAPI
+    process = await asyncio.create_subprocess_exec(
+        python_executable, str(script_path),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await process.communicate()
+    
+    return process.returncode, stdout.decode(), stderr.decode()
 
 #Hash mot de passe
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -44,7 +106,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 #Fake base utilisateur
 fake_users_db = {
     "admin": {
-        "username": "admin",
+        "username": os.getenv("API_USER"),
         "hashed_password": pwd_context.hash("Pwd_iv_26!@"),
     }
 }
@@ -127,11 +189,62 @@ def api_response(current_user: dict = Depends(get_current_user)):
             "message": str(e)
         }
         
-@app_iv.post("/ppl_batch")
-def api_call(
-    background_tasks: BackgroundTasks,
-    current_user: dict = Depends(get_current_user)
-):
-    background_tasks.add_task(run_script_1)
+@app_iv.post("/ppl_batch_1")
+async def api_call(current_user: dict = Depends(get_current_user)):
+    returncode, out, err = await run_script_1()
+    
+    if returncode != 0:
+        return JSONResponse(
+            content={"message": "Script en erreur", "code": returncode, "error": err, "stdout": out},
+            status_code=500
+        )
 
-    return {"status": "script 1 started"}
+    return JSONResponse(
+        content={"message": "Script terminé", "code": returncode, "stdout": out, "stderr": err},
+        status_code=200
+    )
+
+@app_iv.post("/ppl_batch_2")
+async def api_call(current_user: dict = Depends(get_current_user)):
+    returncode, out, err = await run_script_2()
+    
+    if returncode != 0:
+        return JSONResponse(
+            content={"message": "Script en erreur", "code": returncode, "error": err, "stdout": out},
+            status_code=500
+        )
+
+    return JSONResponse(
+        content={"message": "Script terminé", "code": returncode, "stdout": out, "stderr": err},
+        status_code=200
+    )
+    
+@app_iv.post("/ppl_batch_3")
+async def api_call(current_user: dict = Depends(get_current_user)):
+    returncode, out, err = await run_script_3()
+    
+    if returncode != 0:
+        return JSONResponse(
+            content={"message": "Script en erreur", "code": returncode, "error": err, "stdout": out},
+            status_code=500
+        )
+
+    return JSONResponse(
+        content={"message": "Script terminé", "code": returncode, "stdout": out, "stderr": err},
+        status_code=200
+    )
+    
+@app_iv.post("/ppl_batch_4")
+async def api_call(current_user: dict = Depends(get_current_user)):
+    returncode, out, err = await run_script_4()
+    
+    if returncode != 0:
+        return JSONResponse(
+            content={"message": "Script en erreur", "code": returncode, "error": err, "stdout": out},
+            status_code=500
+        )
+
+    return JSONResponse(
+        content={"message": "Script terminé", "code": returncode, "stdout": out, "stderr": err},
+        status_code=200
+    )

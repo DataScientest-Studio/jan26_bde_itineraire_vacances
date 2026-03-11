@@ -13,8 +13,10 @@ h11==0.16.0
 idna==3.11
 passlib==1.7.4
 joblib==1.5.3
+neo4j==6.1.0
 numpy==2.4.2
 pandas==3.0.1
+psutil==7.2.2
 psycopg2-binary==2.9.11
 pyasn1==0.6.2
 pydantic==2.12.5
@@ -39,3 +41,4 @@ threadpoolctl==3.6.0
 tqdm==4.67.3
 urllib3==2.6.3
 uvicorn==0.41.0
+
