@@ -49,7 +49,7 @@ services:
     networks:
       - tourisme_network
 
-   neo4j:
+  neo4j:
     image: neo4j:5
     container_name: neo4j_tourisme
     ports:

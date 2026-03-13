@@ -42,7 +42,7 @@ def clean_text(text):
 
 def predict_all_themes():
     # 1. Chargement du Pipeline (qui contient le vectoriseur et le model)
-    model_path = "api/scripts/ml/models/poi_theme_classifier.joblib" #ATTENTION PEUTETRE A REVOIR AVEC LES DOCKER.
+    model_path = "scripts/ml/models/poi_theme_classifier.joblib" #ATTENTION PEUTETRE A REVOIR AVEC LES DOCKER.
     if not os.path.exists(model_path):
         print("❌ Modèle introuvable")
         return
