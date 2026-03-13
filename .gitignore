@@ -30,5 +30,7 @@ data/postgres
 
 # --- Airflow ---
 # On ne versionne jamais les logs (trop lourd et inutile)
-airflow/logs/
-airflow/plugins/
+airflow/logs/*
+!airflow/logs/.gitkeep
+airflow/plugins/*
+!airflow/plugins/.gitkeep

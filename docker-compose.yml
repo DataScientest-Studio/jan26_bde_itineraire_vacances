@@ -1,14 +1,14 @@
 version: "3"
 
-# 1. Définition de la configuration commune Airflow
+# Cette première partie permet de créer le base commune aux services airflow, ce qui nous permet de ne pas nous répeter par la suite dans notre yml
 x-airflow-common: &airflow-common
   image: apache/airflow:2.8.1
   env_file:
     - .env
-  # On crée une ancre spécifique pour le dictionnaire environment
+  # On crée une ancre spécifique pour le dictionnaire environment car il sera réutilisé seulement dans un service
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    # Connexion à la base de données Airflow dédiée dans ton instance Postgres
+    # On va utiliser le service postgres qui existe déjà, pas besoin de recréer un service différent
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_postgres:5432/airflow_db
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__CORE__FERNET_KEY: ""
@@ -19,7 +19,7 @@ x-airflow-common: &airflow-common
     - ./airflow/plugins:/opt/airflow/plugins
   networks:
     - tourisme_network
-  user: "${AIRFLOW_UID:-50000}:0"
+  user: "${AIRFLOW_UID:-50000}:0" # Standard
   depends_on:
     db_postgres:
       condition: service_healthy
@@ -134,7 +134,7 @@ services:
     container_name: airflow_init
     command: version
     environment:
-      # On utilise l'ancre de l'env pour éviter le cycle YAML
+      # On utilise l'ancre de l'env pour éviter de se repeter
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: "true"
       _AIRFLOW_WWW_USER_CREATE: "true"
