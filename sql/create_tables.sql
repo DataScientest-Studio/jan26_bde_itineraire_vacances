@@ -1,3 +1,5 @@
+CREATE DATABASE airflow_db;
+
 -- 1. Table de référence pour les types (Catalogue unique)
 CREATE TABLE IF NOT EXISTS type (
     typeId SERIAL PRIMARY KEY,

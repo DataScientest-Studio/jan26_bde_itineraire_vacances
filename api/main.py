@@ -107,7 +107,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 fake_users_db = {
     "admin": {
         "username": os.getenv("API_USER"),
-        "hashed_password": pwd_context.hash("Pwd_iv_26!@"),
+        "hashed_password": pwd_context.hash(os.getenv("API_PWD")),
     }
 }
 
