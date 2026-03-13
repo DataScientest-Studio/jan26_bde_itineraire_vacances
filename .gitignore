@@ -26,5 +26,11 @@ data/postgres
 
 # --- OS / IDE ---
 .DS_Store
-#.vscode/
-#.idea/
+.vscode/
+
+# --- Airflow ---
+# On ne versionne jamais les logs (trop lourd et inutile)
+airflow/logs/*
+!airflow/logs/.gitkeep
+airflow/plugins/*
+!airflow/plugins/.gitkeep
