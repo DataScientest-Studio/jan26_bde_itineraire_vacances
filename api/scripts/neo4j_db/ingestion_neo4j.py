@@ -92,6 +92,7 @@ def run_delta_import():
                     LEFT JOIN poitheme pt ON p.uuid = pt.uuid
                     LEFT JOIN theme t ON pt.themeid = t.themeid
                     WHERE p.lastupdate > %s
+                    AND t.themeid IN (1,2,3,4,5)
                 )
                 SELECT * FROM deduplicated_pois 
                 WHERE rn = 1

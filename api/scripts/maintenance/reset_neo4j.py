@@ -1,4 +1,4 @@
-from ..utils.db_connect import get_neo4j_driver
+from scripts.utils.db_connect import get_neo4j_driver
 
 def reset_graph():
     driver = get_neo4j_driver()
