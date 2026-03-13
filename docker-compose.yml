@@ -7,12 +7,15 @@ x-airflow-common: &airflow-common
     - .env
   # On crée une ancre spécifique pour le dictionnaire environment car il sera réutilisé seulement dans un service
   environment: &airflow-common-env
+    PYTHONUNBUFFERED: "1" # Permet d'avoir les logs en temps réel dans la console
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     # On va utiliser le service postgres qui existe déjà, pas besoin de recréer un service différent
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_postgres:5432/airflow_db
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__CORE__FERNET_KEY: ""
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__WEBSERVER__SECRET_KEY: "voiciunsecretwebserver"
+    AIRFLOW__LOGGING__REMOTE_LOGGING: "False"
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
@@ -144,6 +147,7 @@ services:
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow_webserver
+    hostname: airflow_webserver
     command: webserver
     ports:
       - "8080:8080"
@@ -152,6 +156,7 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     container_name: airflow_scheduler
+    hostname: airflow_webserver
     command: scheduler
     restart: always
 
