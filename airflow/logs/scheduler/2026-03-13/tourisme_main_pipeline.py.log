@@ -317,3 +317,52 @@
 [2026-03-13T13:53:12.579+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:53:12.579+0000] {dag.py:3036} INFO - Sync 1 DAGs
 [2026-03-13T13:53:12.598+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:53:12.598+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
 [2026-03-13T13:53:12.607+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.072 seconds
+[2026-03-13T13:53:42.818+0000] {processor.py:161} INFO - Started process (PID=239) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:53:42.819+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:53:42.820+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:53:42.820+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:53:42.828+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:53:42.843+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:53:42.843+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:53:42.858+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:53:42.858+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:53:42.870+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.056 seconds
+[2026-03-13T13:54:13.082+0000] {processor.py:161} INFO - Started process (PID=244) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:54:13.082+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:54:13.083+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:54:13.083+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:54:13.092+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:54:13.114+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:54:13.114+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:54:13.129+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:54:13.129+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:54:13.138+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.059 seconds
+[2026-03-13T13:54:43.327+0000] {processor.py:161} INFO - Started process (PID=249) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:54:43.328+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:54:43.329+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:54:43.328+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:54:43.343+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:54:43.361+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:54:43.361+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:54:43.372+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:54:43.372+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:54:43.379+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.056 seconds
+[2026-03-13T13:55:13.670+0000] {processor.py:161} INFO - Started process (PID=254) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:55:13.671+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:55:13.673+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:55:13.672+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:55:13.689+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:55:13.716+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:55:13.715+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:55:13.736+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:55:13.736+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:55:13.746+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.082 seconds
+[2026-03-13T13:55:43.953+0000] {processor.py:161} INFO - Started process (PID=259) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:55:43.955+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:55:43.956+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:55:43.955+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:55:43.975+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:55:44.000+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:55:44.000+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:55:44.016+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:55:44.016+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:55:44.025+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.078 seconds
+[2026-03-13T13:56:14.375+0000] {processor.py:161} INFO - Started process (PID=264) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:56:14.376+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:56:14.378+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:56:14.377+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:56:14.398+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:56:14.422+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:56:14.422+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:56:14.437+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:56:14.437+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:56:14.448+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.079 seconds
+[2026-03-13T13:56:44.698+0000] {processor.py:161} INFO - Started process (PID=269) to work on /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:56:44.700+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/tourisme_main_pipeline.py for tasks to queue
+[2026-03-13T13:56:44.700+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:56:44.700+0000] {dagbag.py:538} INFO - Filling up the DagBag from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:56:44.712+0000] {processor.py:840} INFO - DAG(s) 'full_tourisme_pipeline' retrieved from /opt/airflow/dags/tourisme_main_pipeline.py
+[2026-03-13T13:56:44.732+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:56:44.732+0000] {dag.py:3036} INFO - Sync 1 DAGs
+[2026-03-13T13:56:44.744+0000] {logging_mixin.py:188} INFO - [2026-03-13T13:56:44.744+0000] {dag.py:3823} INFO - Setting next_dagrun for full_tourisme_pipeline to 2026-03-13 08:00:00+00:00, run_after=2026-03-13 20:00:00+00:00
+[2026-03-13T13:56:44.752+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/tourisme_main_pipeline.py took 0.056 seconds
