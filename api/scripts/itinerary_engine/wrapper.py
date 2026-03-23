@@ -1,41 +1,61 @@
-from scripts.itinerary_engine.contracts import ItineraryRequest, ItineraryResponse, POI
+import time
+
+from scripts.itinerary_engine.contracts import (
+    ItineraryRequest,
+    ItineraryResponse,
+    POI,
+)
 from scripts.itinerary_engine.load_pois_for_city import load_pois_for_city
 from scripts.itinerary_engine.postgres_enricher import enrich_pois_with_postgres
 from scripts.itinerary_engine.itinerary_builder import ItineraryBuilder
 
-def generate_itinerary(req: ItineraryRequest) -> ItineraryResponse:
-    pois_raw = load_pois_for_city(req.postal_code_insee, req.theme)
-    pois = [POI(**p).model_dump() for p in pois_raw]
 
-    # Construction de l'itinéraire (Logique Spatiale / Neo4j)
-    builder = ItineraryBuilder()
+def generate_itinerary(req: ItineraryRequest, use_neo4j: bool = False) -> ItineraryResponse:
+    start = time.time()
+
+    # 1) Charger les POI depuis Postgres
+    pois_raw = load_pois_for_city(req.postalcodeinsee, req.themeid)
+
+    # Limiter dès le début
+    max_poi = req.days * 4
+    pois_raw = pois_raw[:max_poi]
+
+    # 2) Distances
+    if use_neo4j:
+        from scripts.itinerary_engine.neo4j_distance_loader import load_distances_from_neo4j
+        distances = load_distances_from_neo4j(pois_raw)
+        builder = ItineraryBuilder(distances=distances)
+    else:
+        builder = ItineraryBuilder(distances={})
+
+    # 3) Normalisation
+    pois = [POI(**p).dict() for p in pois_raw]
+
+    # 4) Construire l’itinéraire
     itinerary_dict = builder.build_itinerary(
-        postal_code_insee=req.postal_code_insee,
-        theme=req.theme,
+        postalcodeinsee=req.postalcodeinsee,
+        themeid=req.themeid,
         pois=pois,
-        nb_days=req.days
+        nb_days=req.days,
     )
-    builder.close()
 
-    # --- ENRICHISSEMENT POSTGRES ---
-    # 1. On liste uniquement les IDs des POIs qui ont été conservés dans le JSON
-    kept_poi_ids = [
-        step["poi_id"] 
-        for day in itinerary_dict["days"] 
-        for step in day["steps"] 
+    # 5) Enrichissement Postgres
+    kept_uuids = [
+        step["uuid"]
+        for day in itinerary_dict["days"]
+        for step in day["steps"]
         if step["type"] == "poi"
     ]
 
-    # 2. On récupère les données
-    if kept_poi_ids:
-        enriched_data = enrich_pois_with_postgres(kept_poi_ids)
-
-        # 3. On injecte les données dans le dictionnaire final
+    if kept_uuids:
+        enriched_data = enrich_pois_with_postgres(kept_uuids)
         for day in itinerary_dict["days"]:
             for step in day["steps"]:
                 if step["type"] == "poi":
-                    poi_id = step["poi_id"]
-                    if poi_id in enriched_data:
-                        step.update(enriched_data[poi_id])
+                    uid = step["uuid"]
+                    if uid in enriched_data:
+                        step.update(enriched_data[uid])
+
+    itinerary_dict["execution_time_seconds"] = round(time.time() - start, 3)
 
     return ItineraryResponse(**itinerary_dict)

@@ -1,27 +1,41 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Union
+
+# -----------------------------
+# REQUEST
+# -----------------------------
 
 class ItineraryRequest(BaseModel):
-    postal_code_insee: str
-    theme: str
+    postalcodeinsee: str
+    themeid: int
     days: int
 
+# -----------------------------
+# POI (utilisé en interne)
+# -----------------------------
+
 class POI(BaseModel):
-    poi_id: str
+    uuid: str
     label: str
-    lat: float
-    lon: float
-    theme: str
+    latitude: float
+    longitude: float
+    themeid: int
+    postalcodeinsee: str
+
+# -----------------------------
+# STEPS
+# -----------------------------
 
 class StepPOI(BaseModel):
     type: str = "poi"
-    poi_id: str
+    uuid: str
     label: str
-    lat: float
-    lon: float
-    theme: str
+    latitude: float
+    longitude: float
+    themeid: int
     distance_m: int
-    # Nouveaux champs Postgres (Optionnels car certains POIs peuvent ne pas avoir ces infos)
+
+    # Champs enrichis depuis Postgres (optionnels)
     address: Optional[str] = None
     description: Optional[str] = None
     telephone: Optional[str] = None
@@ -32,11 +46,19 @@ class StepEvent(BaseModel):
     event_id: str
     label: str
 
-Step = StepPOI | StepEvent
+Step = Union[StepPOI, StepEvent]
+
+# -----------------------------
+# DAY
+# -----------------------------
 
 class Day(BaseModel):
     day: int
     steps: List[Step]
+
+# -----------------------------
+# SUMMARY
+# -----------------------------
 
 class Summary(BaseModel):
     total_distance_m: int
@@ -45,8 +67,13 @@ class Summary(BaseModel):
     poi_count: int
     steps_count: int
 
+# -----------------------------
+# RESPONSE
+# -----------------------------
+
 class ItineraryResponse(BaseModel):
-    postal_code_insee: str
-    theme: str
+    postalcodeinsee: str
+    themeid: int
     summary: Summary
     days: List[Day]
+    execution_time_seconds: float | None = None

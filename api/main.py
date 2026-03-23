@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 import subprocess
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -16,6 +16,8 @@ import sys
 import psutil
 import asyncio
 import os
+from scripts.itinerary_engine.contracts import ItineraryRequest
+from scripts.itinerary_engine.wrapper import generate_itinerary
 
 load_dotenv()
 
@@ -248,3 +250,45 @@ async def api_call(current_user: dict = Depends(get_current_user)):
         content={"message": "Script terminé", "code": returncode, "stdout": out, "stderr": err},
         status_code=200
     )
+
+@app_iv.get("/generer-itineraire")
+def api_call(
+    city: str = Query(...),
+    days: int = Query(...),
+    category: str = Query(...),
+    current_user: dict = Depends(get_current_user)
+):
+
+    try:
+        with get_pg_conn_api() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute("SELECT postalcodeinsee FROM city WHERE city = %s", (city,))
+                row = cursor.fetchone()
+                if row:
+                    postal_code = str(row["postalcodeinsee"])
+                else:
+                    postal_code = None
+                    
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute("SELECT themeid FROM theme WHERE themelabel = %s", (category,))
+                row = cursor.fetchone()
+                if row:
+                    theme_id = int(row["themeid"])
+                else:
+                    theme_id = None
+                
+    except Exception as e:
+        return {
+            "database": "error",
+            "message": str(e)
+        }
+    
+    req = ItineraryRequest(
+        postalcodeinsee=postal_code,
+        themeid=theme_id,
+        days=days,
+    )
+
+    response = generate_itinerary(req,  use_neo4j=True)
+        
+    return response

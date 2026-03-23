@@ -1,6 +1,8 @@
 from psycopg2.extras import RealDictCursor
 from scripts.utils.db_connect import get_pg_conn
 
+
+
 def enrich_pois_with_postgres(poi_ids):
     if not poi_ids:
         return {}

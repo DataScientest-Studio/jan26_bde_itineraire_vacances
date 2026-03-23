@@ -1,107 +1,153 @@
-import math
-import random
+# itinerary_builder.py
+from typing import List, Dict
+from math import radians, sin, cos, sqrt, atan2
+
 
 class ItineraryBuilder:
-    def __init__(self):
-        pass
+    def __init__(self, distances: Dict[tuple, float]):
+        """
+        distances : dict {(uuid1, uuid2): distance_m}
+        Si distances est vide → fallback Haversine
+        """
+        self.distances = distances
+        self.use_neo4j = len(distances) > 0
 
-    def get_distance_between_point(self, lat1, lon1, lat2, lon2):
-        if None in (lat1, lon1, lat2, lon2):
-            return 0.0
-            
+    def compute_distance(self, p1: Dict, p2: Dict) -> float:
+        """
+        Retourne la distance entre deux POI.
+        - Si Neo4j est activé → utilise le dict distances
+        - Sinon → fallback Haversine
+        """
+        if p1 is None or p2 is None:
+            return 0
+
+        if self.use_neo4j:
+            return self.distances[(p1["uuid"], p2["uuid"])]
+
+        # fallback Haversine (Postgres)
         R = 6371000
-        phi_1 = math.radians(lat1)
-        phi_2 = math.radians(lat2)
-        delta_phi = math.radians(lat2 - lat1)
-        delta_lambda = math.radians(lon2 - lon1)
-        
-        a = math.sin(delta_phi / 2.0) ** 2 + math.cos(phi_1) * math.cos(phi_2) * math.sin(delta_lambda / 2.0) ** 2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return R * c
+        dlat = radians(p2["latitude"] - p1["latitude"])
+        dlon = radians(p2["longitude"] - p1["longitude"])
+        a = sin(dlat/2)**2 + cos(radians(p1["latitude"])) * cos(radians(p2["latitude"])) * sin(dlon/2)**2
+        return R * 2 * atan2(sqrt(a), sqrt(1 - a))
 
-    def order_pois(self, pois):
-        pois_copy = pois.copy()
-        ordered = []
-
-        if not pois_copy:
+    def _nearest_neighbour_order(self, pois: List[Dict]) -> List[Dict]:
+        """
+        Ordre des POI par plus proche voisin.
+        """
+        if not pois:
             return []
 
-        # Sélection aléatoire ("au pif") du premier point
-        start_poi = random.choice(pois_copy)
-        ordered.append(start_poi)
-        pois_copy = [p for p in pois_copy if p["poi_id"] != start_poi["poi_id"]]
+        unvisited = pois.copy()
+        path = []
 
-        current = start_poi
-        while pois_copy:
-            next_poi = min(
-                pois_copy,
-                key=lambda p: self.get_distance_between_point(
-                    current["lat"], current["lon"], p["lat"], p["lon"]
-                )
+        current = unvisited.pop(0)
+        path.append(current)
+
+        while unvisited:
+            nearest = min(
+                unvisited,
+                key=lambda p: self.compute_distance(current, p),
             )
-            ordered.append(next_poi)
-            pois_copy = [p for p in pois_copy if p["poi_id"] != next_poi["poi_id"]]
-            current = next_poi
+            unvisited.remove(nearest)
+            path.append(nearest)
+            current = nearest
 
-        return ordered
+        return path
 
-    def build_itinerary(self, postal_code_insee, theme, pois, nb_days):
-        ordered = self.order_pois(pois)
-        max_pois = nb_days * 4
-        ordered = ordered[:max_pois]
+    def _select_best_pois(self, pois: List[Dict], nb_days: int) -> List[Dict]:
+        """
+        Sélectionne max 4 POI par jour.
+        """
+        max_poi = nb_days * 4
+        if len(pois) <= max_poi:
+            return pois
 
-        chunks = [ordered[i:i+4] for i in range(0, len(ordered), 4)]
+        ordered = self._nearest_neighbour_order(pois)
+        return ordered[:max_poi]
 
-        days_output = []
-        total_distance = 0
-        prev_global = None  # Sert à garder le dernier POI de la veille en mémoire
+    def build_itinerary(self, postalcodeinsee: str, themeid: int, pois: List[Dict], nb_days: int) -> Dict:
+        """
+        Construit l’itinéraire complet :
+        - sélection POI
+        - ordre nearest neighbour
+        - découpage par jour
+        - insertion pause déjeuner
+        - calcul distances
+        """
+        if not pois:
+            return {
+                "postalcodeinsee": postalcodeinsee,
+                "themeid": themeid,
+                "summary": {
+                    "total_distance_m": 0,
+                    "estimated_duration_s": 0,
+                    "days_count": nb_days,
+                    "poi_count": 0,
+                    "steps_count": 0,
+                },
+                "days": [],
+            }
 
-        for day_index, day_pois in enumerate(chunks, start=1):
+        # 1) Sélection
+        pois = self._select_best_pois(pois, nb_days)
+
+        # 2) Ordre
+        ordered_pois = self._nearest_neighbour_order(pois)
+
+        # 3) Découpage par jour
+        pois_per_day = max(1, len(ordered_pois) // nb_days)
+        days = []
+        index = 0
+
+        for day in range(1, nb_days + 1):
+            day_pois = ordered_pois[index:index + pois_per_day]
+            index += pois_per_day
+
             steps = []
-            
-            for poi in day_pois[:2]:
-                steps.append({"type": "poi", **poi})
-            
-            if len(day_pois) >= 2:
-                steps.append({"type": "event", "event_id": "LUNCH_BREAK", "label": "Pause déjeuner"})
-            
-            for poi in day_pois[2:4]:
-                steps.append({"type": "poi", **poi})
+            prev = None
+            for poi in day_pois:
+                dist = self.compute_distance(prev, poi) if prev else 0
+                steps.append({
+                    "type": "poi",
+                    "uuid": poi["uuid"],
+                    "label": poi["label"],
+                    "latitude": poi["latitude"],
+                    "longitude": poi["longitude"],
+                    "themeid": themeid,
+                    "distance_m": int(dist),
+                })
+                prev = poi
 
-            prev_step = None
-            for step in steps:
-                if step["type"] == "poi":
-                    if prev_step is None and prev_global is None:
-                        # Tout premier POI du voyage
-                        d = 0.0
-                    elif prev_step is None and prev_global is not None:
-                        # Premier POI du jour (distance depuis le dernier de la veille)
-                        d = self.get_distance_between_point(prev_global["lat"], prev_global["lon"], step["lat"], step["lon"])
-                    else:
-                        # POI suivant dans la même journée
-                        d = self.get_distance_between_point(prev_step["lat"], prev_step["lon"], step["lat"], step["lon"])
+            # Pause déjeuner
+            if steps:
+                steps.insert(len(steps) // 2, {
+                    "type": "event",
+                    "event_id": "LUNCH_BREAK",
+                    "label": "Pause déjeuner",
+                })
 
-                    step["distance_m"] = int(d)
-                    total_distance += d
-                    prev_step = step
-                    prev_global = step
+            days.append({"day": day, "steps": steps})
 
-            days_output.append({"day": day_index, "steps": steps})
+        # 4) Résumé
+        total_distance = sum(
+            s["distance_m"]
+            for d in days
+            for s in d["steps"]
+            if s["type"] == "poi"
+        )
 
         summary = {
             "total_distance_m": int(total_distance),
             "estimated_duration_s": int(total_distance / 1.2),
-            "days_count": len(days_output),
-            "poi_count": len(ordered),
-            "steps_count": sum(len(d["steps"]) for d in days_output)
+            "days_count": nb_days,
+            "poi_count": len(pois),
+            "steps_count": sum(len(d["steps"]) for d in days),
         }
 
         return {
-            "postal_code_insee": postal_code_insee,
-            "theme": theme,
+            "postalcodeinsee": postalcodeinsee,
+            "themeid": themeid,
             "summary": summary,
-            "days": days_output
+            "days": days,
         }
-
-    def close(self):
-        pass
