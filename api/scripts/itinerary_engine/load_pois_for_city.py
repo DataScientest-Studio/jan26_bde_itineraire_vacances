@@ -1,36 +1,68 @@
-from scripts.utils.db_connect import get_neo4j_driver
+from scripts.utils.db_connect import get_pg_conn_api
 
-def load_pois_for_city(postal_code_insee, theme_label):
+def load_pois_for_city(postalcodeinsee: str, themeid: int):
     """
-    Récupère les POIs depuis Neo4j en utilisant les relations du graphe.
+    Charge les POIs depuis Postgres :
+    - poi
+    - poitheme
+    - theme
+    - poilocation
+    - city
     """
-    driver = get_neo4j_driver()
-    
+    conn = get_pg_conn_api()
+    cur = conn.cursor()
+
     query = """
-    MATCH (c:City {postalcodeinsee: $postal_code_insee})<-[:LOCATED_IN]-(p:POI)-[:HAS_THEME]->(t:Theme)
-    WHERE toLower(t.label) CONTAINS toLower(trim($theme_label))
-    RETURN p.uuid AS poi_id, p.label AS label, p.latitude AS lat, p.longitude AS lon, t.label AS theme_name
+        SELECT
+            p.uuid,
+            p.label,
+            p.description,
+            p.shortdescription,
+            p.uri,
+            p.legalname,
+            p.telephone,
+            p.email,
+            p.homepage,
+            p.lastupdate,
+            p.lastupdatedatatourisme,
+            pl.latitude,
+            pl.longitude,
+            t.themeid,
+            c.postalcodeinsee
+        FROM poi p
+        JOIN poitheme pt ON pt.uuid = p.uuid
+        JOIN theme t ON t.themeid = pt.themeid
+        JOIN poilocation pl ON pl.uuid = p.uuid
+        JOIN city c ON c.postalcodeinsee = pl.postalcodeinsee
+        WHERE c.postalcodeinsee = %s
+          AND t.themeid = %s
     """
-    
-    with driver.session() as session:
-        # C'EST ICI QUE ÇA PLANTAIT : le kwarg doit être postal_code_insee=postal_code_insee
-        result = session.run(query, postal_code_insee=postal_code_insee, theme_label=theme_label)
-        
-        pois = []
-        for record in result:
-            try:
-                pois.append({
-                    "poi_id": record["poi_id"],
-                    "label": record["label"] or "Sans nom",
-                    "lat": float(record["lat"]),
-                    "lon": float(record["lon"]),
-                    "theme": record["theme_name"]
-                })
-            except (TypeError, ValueError):
-                continue
-        
-    driver.close()
-    
-    print(f"🛠️  [DEBUG Neo4j] {len(pois)} POIs trouvés pour CP INSEE='{postal_code_insee}' / Thème='{theme_label}'")
-    
+
+    cur.execute(query, (postalcodeinsee, themeid))
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    pois = []
+    for r in rows:
+        pois.append({
+            "uuid": r[0],
+            "label": r[1],
+            "description": r[2],
+            "shortdescription": r[3],
+            "uri": r[4],
+            "legalname": r[5],
+            "telephone": r[6],
+            "email": r[7],
+            "homepage": r[8],
+            "lastupdate": r[9],
+            "lastupdatedatatourisme": r[10],
+            "latitude": float(r[11]) if r[11] is not None else None,
+            "longitude": float(r[12]) if r[12] is not None else None,
+            "themeid": r[13],
+            "postalcodeinsee": r[14],
+        })
+
+    print(f"[DEBUG Postgres] {len(pois)} POIs chargés depuis Postgres")
     return pois
