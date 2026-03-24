@@ -1,9 +1,12 @@
+import os
 import time
 import streamlit as st
 import streamlit.components.v1 as components
 import requests
 import pandas as pd
 from streamlit_local_storage import LocalStorage
+
+BASE_URL = os.getenv("API_URL", "http://api:8000")
 
 # Initialisation du module
 localS = LocalStorage()
@@ -13,26 +16,34 @@ localS = LocalStorage()
 
 @st.cache_data(ttl=10800)
 def get_cities_auto():
-    # Liste de secours automatique (Fallback)
-    fallback_cities = ["Paris", "Paris2","Bordeaux", "Lyon", "Marseille", "Biarritz"]
+    # Liste de secours au cas où l'API est éteinte
+    fallback_cities = [
+        {"city": "Paris", "postal_code_insee": "75056"},
+        {"city": "Marseille", "postal_code_insee": "13055"}
+    ]
     
     try:
-        # Réduction du timeout à 1s pour ne pas bloquer l'utilisateur
-        token_url = "http://api:8000/token"
-        auth_data = {"username": "admin", "password": "Pwd_iv_26!@"}
-        resp_token = requests.post(token_url, data=auth_data, timeout=1)
+        token_url = "http://api:8000/token" 
+        auth_data = {
+            "username": os.getenv("API_USER"), 
+            "password": os.getenv("API_PWD") 
+        }
+        resp_token = requests.post(token_url, data=auth_data, timeout=5)
         
         if resp_token.status_code == 200:
             token = resp_token.json().get("access_token")
             cities_url = "http://api:8000/cities"
             headers = {"Authorization": f"Bearer {token}"}
-            resp_cities = requests.get(cities_url, headers=headers, timeout=1)
+            
+            # Interroge l'API et création "resp_cities"
+            resp_cities = requests.get(cities_url, headers=headers, timeout=5)
             
             if resp_cities.status_code == 200:
-                return [r["city"] for r in resp_cities.json()] 
+                # On renvoie tout le JSON directement (qui contient {city, postal_code_insee})
+                return resp_cities.json()
                 
     except (requests.exceptions.RequestException, Exception):
-        # En cas d'erreur API, on utilise silencieusement les données de secours
+        # En cas d'erreur API, on passe silencieusement à la suite
         pass 
         
     return fallback_cities
@@ -87,6 +98,7 @@ with st.sidebar:
             st.rerun()
 
     st.write("---")
+
     # Existence de favoris pour appliquer un style différent
     favoris_nav = localS.getItem("mes_favoris_itinego") or []
     is_empty = len(favoris_nav) == 0
@@ -106,7 +118,7 @@ with st.sidebar:
     
 
 
-# 3. Design global (CSS)
+# 3. Design global CSS
 
 st.markdown("""
     <style>
@@ -162,7 +174,7 @@ if st.session_state.step >= 1 and st.session_state.step != 5:
     st.subheader("Choisissez votre destination :material/location_on:")
 
     villes_db = get_cities_auto()
-    ville_temp = st.selectbox("Destination", options=villes_db, index=None, placeholder="Commencez à taper (ex: Paris...)", label_visibility="collapsed")
+    ville_temp = st.selectbox("Destination", options=villes_db, format_func=lambda x: x["city"], index=None, placeholder="Commencez à taper (ex: Paris...)", label_visibility="collapsed")
 
     alerte_ville = st.empty()
     st.write("##")
@@ -171,7 +183,7 @@ if st.session_state.step >= 1 and st.session_state.step != 5:
         if not ville_temp:
             alerte_ville.warning("Veuillez choisir une ville avant de passer à la suite. ⚠️")
         else:
-            st.session_state.ville = ville_temp
+            st.session_state.ville = ville_temp["city"]
             st.session_state.step = 2
             st.rerun()
 
@@ -227,24 +239,68 @@ if st.session_state.step >= 3 and st.session_state.step != 5:
                 time.sleep(1.0)
             info_place.empty()
             
-            # --- TENTATIVE API ---
+            # API
             try:
-                payload = {"city": st.session_state.ville, "days": st.session_state.duree, "theme": thematique}
+                # Token d'authentification
+                token_url = "http://api:8000/token"
+                auth_data = {
+                    "username": os.getenv("API_USER"), 
+                    "password": os.getenv("API_PWD") 
+                }
+                resp_token = requests.post(token_url, data=auth_data, timeout=5)
                 
-                # MODE PRODUCTION : Quand l'API sera prête dans le Docker :
-                # 1. DÉCOMMENTER les 4 lignes ci-dessous pour activer l'appel à l'API
-                # response = requests.post("http://api:8000/generate", json=payload, timeout=5) 
-                # if response.status_code == 200:
-                #     st.session_state.data_voyage = response.json()
-                # else:
-                
-                # 2. Supprimer (ou commenter) cette ligne raise ConnectionError
-                raise ConnectionError 
+                if resp_token.status_code == 200:
+                    token = resp_token.json().get("access_token")
+                    headers = {"Authorization": f"Bearer {token}"}
 
-            except (requests.exceptions.RequestException, ConnectionError):
+                    # Traduction de la thématique en numéro pour l'API
+                    traduction_bdd = {
+                        "Culture": "Culturel", 
+                        "Sport": "Sportif", 
+                        "Gastronomie": "Gastronomique", 
+                        "En famille": "Familial", 
+                        "Bien-être/Relaxation": "Détente & bien-être"
+                    }
+                    
+                    category_pour_api = traduction_bdd.get(thematique, "Culturel")
+
+                    parametres = {
+                        "city": st.session_state.ville,
+                        "days": st.session_state.duree,
+                        "category": category_pour_api 
+                    }
+                
+                    reponse = requests.get(
+                        "http://api:8000/generer-itineraire", 
+                        params=parametres,
+                        headers=headers,
+                        timeout=15
+                    )
+
+                    if reponse.status_code == 200:
+                        data = reponse.json()
+                        st.session_state.data_voyage = data 
+                        st.session_state.step = 4
+                        st.rerun()
+                
+                    else:
+                        st.error(f"Erreur API : {reponse.status_code} - {reponse.text}")
+                        st.stop()
+                else:
+                    st.error("Impossible d'obtenir l'autorisation de l'API (Token).")
+                    st.stop()
+
+            # GESTION DES ERREURS
+            except requests.exceptions.RequestException as e:
+                st.error(f"📡 **Erreur réseau** : Impossible de joindre l'API. ({e})")
+                st.stop()
+            except Exception as e:
+                st.error(f"💥 **Erreur critique** : {e}")
+                st.stop()
+
                 # Mode démo : données de secours en cas d'erreur API ou pour les tests locaux
                 st.session_state.data_voyage = {
-                    "days": [
+                    "itinerary": [
                         {"day": 1, "steps": [
                             {"time": "08:00", "poi_id": "PAR002", "label": "Cathédrale Notre-Dame", "lat": 48.8529, "lon": 2.3499, "themes": ["Culturel"]},
                             {"time": "10:00", "poi_id": "PAR010", "label": "Sainte-Chapelle", "lat": 48.8554, "lon": 2.345, "themes": ["Culturel"]},
@@ -265,7 +321,7 @@ if st.session_state.step >= 3 and st.session_state.step != 5:
 
         # Sortie du spinner et passage direct à l'étape 4
         st.session_state.step = 4
-        st.rerun()
+        # st.rerun()
 
 
 
@@ -281,43 +337,79 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
     theme_choisi = st.session_state.get("thematique", "Culture")
     st.markdown(f"<div style='margin-bottom: 20px;'><b>Thématique :</b> <span style='background-color:#FFF0ED; color:#FF4500; padding:4px 12px; border-radius:12px; font-size:0.85rem; font-weight:bold; margin-left: 10px;'>{theme_choisi}</span></div>", unsafe_allow_html=True)
     
+    # Récupération de la liste "itinerary" du JSON pour afficher la carte et l'itinéraire détaillé
+    itineraire = st.session_state.data_voyage.get("days", [])
+
     map_points = []
-    for day in st.session_state.data_voyage.get("days", []):
+    for day in itineraire:
         for step in day.get("steps", []):
-            if "lat" in step and "lon" in step:
-                map_points.append({"lat": step["lat"], "lon": step["lon"], "name": step["label"]})
+            if "latitude" in step and "longitude" in step:
+                map_points.append({"lat": step["latitude"], "lon": step["longitude"], "label": step["label"]})
     
     if map_points:
         df_map = pd.DataFrame(map_points)
         st.subheader(f"Exploration de {st.session_state.ville}")
         st.map(df_map, size=70, color='#FF4500', zoom=12)
         st.write("##")
-
+        
+    # Affichage de l'itinéraire détaillé
     st.markdown("### Votre itinéraire détaillé")
     
-    for day in st.session_state.data_voyage.get("days", []):
-        with st.container(border=True):
-            html_day = f"<h4 style='color:#111827; margin-bottom: 20px; display: flex; align-items: center;'><span class='material-icons-round' style='margin-right: 8px; color:#FF4500;'>calendar_month</span> JOUR {day['day']}</h4>"
-            
-            steps_list = day.get("steps", [])
-            for idx, pt in enumerate(steps_list):
-                heure = pt.get("time", "08:00")
-                is_lunch = pt.get("poi_id") == "LUNCH_BREAK"
-                is_last = (idx == len(steps_list) - 1)
+    if not itineraire:
+        st.warning("⚠️ L'itinéraire a été généré, mais il est vide (0 POI).")
+    else:
+        # Affichage timeline verticale
+        for day in itineraire:
+            with st.container(border=True):
+                html_day = f"<h4 style='color:#111827; margin-bottom: 20px; display: flex; align-items: center;'><span class='material-icons-round' style='margin-right: 8px; color:#FF4500;'>calendar_month</span> JOUR {day['day']}</h4>"
                 
-                line_html = "" if is_last else "<div style='position: absolute; left: 63px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.2;'></div>"
-                time_display = "" if is_lunch else f"{heure}"
-                icon_name = "restaurant" if is_lunch else "location_on"
-                icon = f"<span class='material-icons-round' style='color: #FF4500; font-size: 1.3rem;'>{icon_name}</span>"
-                
-                if is_lunch:
-                    desc_html = "<p style='color: #6B7280; font-size: 0.85rem; margin: 0;'>Temps libre (2h)</p>"
-                else:
-                    desc_html = f"<div style='margin-top: 4px;'><span style='color: #6B7280; font-size: 0.85rem;'>Visite (2h)</span></div>"
-                
-                html_day += f"<div style='display: flex; position: relative; margin-bottom: 0px;'>{line_html}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{time_display}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon}</div><div style='flex: 1; padding-bottom: 25px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_html}</div></div>"
-            
-            st.markdown(html_day, unsafe_allow_html=True)
+                steps_list = day.get("steps", [])
+                grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00"]
+
+                for idx, pt in enumerate(steps_list):
+                    # On récupère l'heure selon la position (idx) dans la liste
+                    # S'il y a plus de 5 étapes, on met 18:00 par défaut
+                    grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00"]
+
+                for idx, pt in enumerate(steps_list):
+                    heure = grille_horaire[idx] if idx < len(grille_horaire) else "18:00"
+                    is_lunch = pt.get("event_id") == "LUNCH_BREAK" 
+                    is_last = (idx == len(steps_list) - 1)
+                    
+                    # Ligne verticale de la timeline (sauf pour le dernier point)
+                    line_html = "" if is_last else "<div style='position: absolute; left: 63px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.2;'></div>"
+                    time_display = "" if is_lunch else f"{heure}"
+                    icon_name = "restaurant" if is_lunch else "location_on"
+                    icon = f"<span class='material-icons-round' style='color: #FF4500; font-size: 1.3rem;'>{icon_name}</span>"
+                    
+                    # Détails du POI (ou du déjeuner)
+                    if is_lunch:
+                        desc_html = "<p style='color: #6B7280; font-size: 0.85rem; margin: 0;'>Pause déjeuner • <b>2h</b></p>"
+                    else:
+                        # Récupération des infos du POI avec des valeurs par défaut si elles sont manquantes
+                        adr = pt.get("address", "Adresse non dispo")
+                        tel = pt.get("telephone", "")
+                        web = pt.get("website", "")
+                        desc = pt.get("description", "Aucune description.")
+                        
+                        # Ligne de contact style Maps
+                        contact_info = f"📍 {adr}"
+                        if tel: contact_info += f" • 📞 {tel}"
+                        if web: contact_info += f" • <a href='{web}' target='_blank' style='color:#FF4500; text-decoration:none;'>🌐 Site Web</a>"
+                        
+                        # Assemblage final de la description du POI
+                        desc_html = f"""
+                            <div style='font-size: 0.8rem; color: #6B7280; margin-top: 4px;'>{contact_info}</div>
+                            <div style='margin-top: 6px;'><span style='color: #FF4500; font-weight: bold; font-size: 0.8rem;'>⏱ 2h</span></div>
+                            <details style='margin-top: 8px; cursor: pointer;'>
+                                <summary style='font-size: 0.8rem; color: #FF4500; font-weight: bold;'>En savoir plus...</summary>
+                                <p style='font-size: 0.85rem; color: #4B5563; margin-top: 5px; line-height: 1.4;'>{desc}</p>
+                            </details>
+                        """
+                    
+                    # Html final de la ligne de l'étape (avec la timeline, l'icône, le titre et les détails)
+                    html_day += f"<div style='display: flex; position: relative; margin-bottom: 0px;'>{line_html}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{time_display}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon}</div><div style='flex: 1; padding-bottom: 25px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_html}</div></div>"
+                st.markdown(html_day, unsafe_allow_html=True)
 
     st.success("Votre itinéraire personnalisé est prêt !")
     st.write("##")
@@ -370,47 +462,58 @@ if st.session_state.step == 5:
             del st.session_state.view_favori
             st.rerun()
         
+        # Récupération des données
         fav = st.session_state.view_favori
         data_fav = fav["data"]
-        
+        itineraire_fav = data_fav.get("days", [])
+
         st.markdown('<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">', unsafe_allow_html=True)
         st.subheader(fav["nom"])
         st.write("---")
         
-        # 1. Carte du favori
-        map_points = []
-        for day in data_fav.get("days", []):
-            for step_point in day.get("steps", []):
-                if "lat" in step_point and "lon" in step_point:
-                    map_points.append({"lat": step_point["lat"], "lon": step_point["lon"], "name": step_point["label"]})
+        # Affichage de l'itinéraire en colonne unique
+        grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00"]
         
-        if map_points:
-            df_map = pd.DataFrame(map_points)
-            st.map(df_map, size=70, color='#FF4500', zoom=12)
-            st.write("##")
-
-        # 2. Itinéraire Timeline du favori
-        for day in data_fav.get("days", []):
+        for day in itineraire_fav:
             with st.container(border=True):
-                html_day = f"<h4 style='color:#111827; margin-bottom: 20px; display: flex; align-items: center;'><span class='material-icons-round' style='margin-right: 8px; color:#FF4500;'>calendar_month</span> JOUR {day['day']}</h4>"
-                
+                html_day = f"<h4 style='color:#111827; margin-bottom: 25px;'>JOUR {day['day']}</h4>"
                 steps_list = day.get("steps", [])
+                
                 for idx, pt in enumerate(steps_list):
-                    heure = pt.get("time", "08:00")
-                    is_lunch = pt.get("poi_id") == "LUNCH_BREAK"
+                    # Logique horaire
+                    heure = grille_horaire[idx] if idx < len(grille_horaire) else "18:00"
+                    is_lunch = pt.get("event_id") == "LUNCH_BREAK"
                     is_last = (idx == len(steps_list) - 1)
-                    
-                    line_html = "" if is_last else "<div style='position: absolute; left: 63px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.2;'></div>"
-                    time_display = "" if is_lunch else f"{heure}"
+                    time_display = "" if is_lunch else heure
                     icon_name = "restaurant" if is_lunch else "location_on"
-                    icon = f"<span class='material-icons-round' style='color: #FF4500; font-size: 1.3rem;'>{icon_name}</span>"
                     
+                    # Détails (Assemblage compact pour éviter le bug Markdown)
                     if is_lunch:
-                        desc_html = "<p style='color: #6B7280; font-size: 0.85rem; margin: 0;'>Temps libre (2h)</p>"
+                        detail_html = "<p style='color: #6B7280; font-size: 0.85rem; margin: 0;'>Pause déjeuner • <b>2h</b></p>"
                     else:
-                        desc_html = f"<div style='margin-top: 4px;'><span style='color: #6B7280; font-size: 0.85rem;'>Visite (2h)</span></div>"
+                        adr, tel, web, desc = pt.get("address", "N/A"), pt.get("telephone", ""), pt.get("website", ""), pt.get("description", "")
+                        contact_row = f"📍 {adr}"
+                        if tel: contact_row += f" • 📞 {tel}"
+                        if web: contact_row += f" • <a href='{web}' target='_blank' style='color:#FF4500; text-decoration:none;'>🌐 Site</a>"
+                        
+                        detail_html = (
+                            f"<div style='font-size: 0.8rem; color: #6B7280; margin-top: 4px;'>{contact_row}</div>"
+                            f"<div style='margin-top: 6px;'><span style='color: #FF4500; font-weight: bold; font-size: 0.8rem;'>⏱ 2h</span></div>"
+                            f"<details style='margin-top: 8px; cursor: pointer;'><summary style='font-size: 0.8rem; color: #FF4500; font-weight: bold;'>En savoir plus...</summary>"
+                            f"<p style='font-size: 0.85rem; color: #4B5563; margin-top: 5px; line-height: 1.4;'>{desc}</p></details>"
+                        )
+
+                    # Construction de la ligne Timeline 
+                    line_css = "" if is_last else "<div style='position: absolute; left: 68px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.1;'></div>"
                     
-                    html_day += f"<div style='display: flex; position: relative; margin-bottom: 0px;'>{line_html}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{time_display}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon}</div><div style='flex: 1; padding-bottom: 25px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_html}</div></div>"
+                    html_day += (
+                        f"<div style='display: flex; position: relative; margin-bottom: 5px;'>"
+                        f"{line_css}"
+                        f"<div style='width: 50px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{time_display}</div>"
+                        f"<div style='width: 35px; text-align: center; margin-left: 10px; margin-right: 10px;'><span class='material-icons-round' style='color: #FF4500; font-size: 1.2rem;'>{icon_name}</span></div>"
+                        f"<div style='flex: 1; padding-bottom: 30px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{detail_html}</div>"
+                        f"</div>"
+                    )
                 
                 st.markdown(html_day, unsafe_allow_html=True)
 
