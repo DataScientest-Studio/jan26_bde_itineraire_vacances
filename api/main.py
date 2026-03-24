@@ -181,7 +181,7 @@ def api_response(current_user: dict = Depends(get_current_user)):
     try:
         with get_pg_conn_api() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute("SELECT city FROM city ORDER BY city ASC;")
+                cursor.execute("SELECT postalcodeinsee, city FROM city ORDER BY city ASC;")
                 rows = cursor.fetchall()
                 json_data = json.dumps(rows, indent=2)
                 return rows
@@ -262,14 +262,6 @@ def api_call(
     try:
         with get_pg_conn_api() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute("SELECT postalcodeinsee FROM city WHERE city = %s", (city,))
-                row = cursor.fetchone()
-                if row:
-                    postal_code = str(row["postalcodeinsee"])
-                else:
-                    postal_code = None
-                    
-            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute("SELECT themeid FROM theme WHERE themelabel = %s", (category,))
                 row = cursor.fetchone()
                 if row:
@@ -284,11 +276,12 @@ def api_call(
         }
     
     req = ItineraryRequest(
-        postalcodeinsee=postal_code,
+        postalcodeinsee=city,
         themeid=theme_id,
         days=days,
     )
 
     response = generate_itinerary(req,  use_neo4j=True)
-        
+    
     return response
+    
