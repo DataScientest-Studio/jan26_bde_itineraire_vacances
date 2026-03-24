@@ -18,8 +18,8 @@ localS = LocalStorage()
 def get_cities_auto():
     # Liste de secours au cas où l'API est éteinte
     fallback_cities = [
-        {"city": "Paris", "postal_code_insee": "75056"},
-        {"city": "Marseille", "postal_code_insee": "13055"}
+        {"city": "Paris", "postalcodeinsee": "75056"},
+        {"city": "Marseille", "postalcodeinsee": "13055"}
     ]
     
     try:
@@ -174,8 +174,15 @@ if st.session_state.step >= 1 and st.session_state.step != 5:
     st.subheader("Choisissez votre destination :material/location_on:")
 
     villes_db = get_cities_auto()
-    ville_temp = st.selectbox("Destination", options=villes_db, format_func=lambda x: x["city"], index=None, placeholder="Commencez à taper (ex: Paris...)", label_visibility="collapsed")
-
+    # On utilise f-string pour combiner le NOM et les 2 premiers chiffres du CODE INSEE
+    ville_temp = st.selectbox(
+        "Destination", 
+        options=villes_db, 
+        format_func=lambda x: f"{x['city']} ({x['postalcodeinsee']})", 
+        index=None, 
+        placeholder="Commencez à taper (ex: Paris...)", 
+        label_visibility="collapsed"
+    )
     alerte_ville = st.empty()
     st.write("##")
 
@@ -183,7 +190,10 @@ if st.session_state.step >= 1 and st.session_state.step != 5:
         if not ville_temp:
             alerte_ville.warning("Veuillez choisir une ville avant de passer à la suite. ⚠️")
         else:
-            st.session_state.ville = ville_temp["city"]
+            # On stocke le CODE pour l'API
+            st.session_state.ville = ville_temp["postalcodeinsee"] 
+            # On stocke le NOM pour l'affichage à l'écran
+            st.session_state.nom_ville_display = ville_temp["city"] 
             st.session_state.step = 2
             st.rerun()
 
@@ -348,7 +358,7 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
     
     if map_points:
         df_map = pd.DataFrame(map_points)
-        st.subheader(f"Exploration de {st.session_state.ville}")
+        st.subheader(f"Exploration de {st.session_state.get('nom_ville_display', 'votre destination')}")
         st.map(df_map, size=70, color='#FF4500', zoom=12)
         st.write("##")
         
