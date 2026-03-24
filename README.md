@@ -84,27 +84,25 @@ Voici un aperçu de la structure du projet et de l'objectif de chaque dossier :
 ```
 .
 ├── .github/        # Contient les workflows d'intégration continue (CI/CD).
-├── dashboard/      # Contient l'application dashboard (Streamlit, Dash...).
 ├── data/           # Volumes des bases de données persistantes (gérés par Docker).
-├── deploy/         # Scripts et configurations pour le déploiement.
-├── ml/             # Code pour les modèles de Machine Learning.
-│   ├── data/       # Données pour l'entraînement et la prédiction.
-│   ├── models/     # Modèles de ML entraînés.
-│   └── scripts/    # Scripts pour l'entraînement et la prédiction.
 ├── notebooks/      # Notebooks Jupyter pour l'exploration et l'analyse.
-├── scripts/        # Scripts Python pour l'ingestion, le traitement, l'API, etc.
-│   ├── analysis/   # Scripts pour analyser les données.
-│   ├── api/        # Code source de l'API FastAPI qui expose les données.
-│   ├── ingestion/  # Scripts pour importer les données depuis des sources externes.
-│   ├── maintenance/# Scripts pour la maintenance des BDD (reset, setup).
-│   ├── processing/ # Scripts pour nettoyer, transformer et transférer les données.
-│   ├── sql/        # Fichiers SQL (création de schémas de BDD).
-│   └── utils/      # Fonctions utilitaires partagées.
+├── api/            # API
+├── requirements.txt # Liste des dépendances Python.
+│   ├── scripts/    # Scripts python
+├──------------ ml/             # Code pour les modèles de Machine Learning.
+│                ├── models/     # Modèles de ML entraînés.
+│                └── train/    # Scripts pour l'entraînement et la prédiction.
+│                ├── ingestion/  # Scripts pour importer les données depuis des sources externes.
+│                ├── maintenance/# Scripts pour la maintenance des BDD (reset, setup).
+│                ├── processing/ # Scripts pour nettoyer, transformer et transférer les données.
+|                |   neo4j_db    #
+│                ├── sql/        # Fichiers SQL (création de schémas de BDD).
+│                └── utils/      # Fonctions utilitaires partagées.
+|---streamlit       # ux
 ├── .env.example    # Fichier d'exemple pour les variables d'environnement.
 ├── .gitignore      # Fichiers et dossiers ignorés par Git.
 ├── docker-compose.yml # Fichier de configuration pour les services Docker.
 ├── LICENSE         # Licence du projet.
-├── requirements.txt # Liste des dépendances Python.
 └── script_streamlit.py # Script pour un dashboard Streamlit.
 ```
 
@@ -121,12 +119,17 @@ token bearer associé à admin à utiliser pour authentification:
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTgwMzQ3MDE4MH0.i7CqDbcbsjUYYcOxiNfFMlEWOzajP6ddWuDI-vX_pkU",
   "token_type": "bearer"
 }
-La gestion des token reste à préciser pour la suite, temporaire?, permanent?, sans token car utilisation interne?
-Quelques variables dont le token seront mises dans .env du projet.
 
-Endpoints existant à ce jour:
-http://127.0.0.1:8000/users/me : renvoie le users/me
-http://127.0.0.1:8000/internal : renvoie un message mais deviendra le endpoint appelé par ux
-http://127.0.0.1:8000/cities : renvoie la liste des villes de la table city par ordre alphabétique
+Quelques variables sont mises dans .env du projet.
+
+Endpoints disponibles:
+POST http://127.0.0.1:8000/token : peut être appelé par user admin pour générer un token,
+GET http://127.0.0.1:8000/cities : appelé par ux pour renseigner la liste des villes dans la combo localité de l’ux.
+POST http://127.0.0.1:8000/ppl_batch_1 : appelé par Airflow pour le traitement batch d’ingestion des données DATAtourisme.
+POST http://127.0.0.1:8000/ppl_batch_2 : appelé par Airflow pour le traitement batch mongoDB  vers PostgreSQL.
+POST http://127.0.0.1:8000/ppl_batch_3 : appelé par Airflow pour le traitement Machine Learning.
+POST http://127.0.0.1:8000/ppl_batch_4 : appelé par Airflow pour le traitement batch d’ingestion des données dans Neo4j.
+GET http://127.0.0.1:8000/generer-itineraire : appelé par ux avec les 3 paramètres city, days, category, renseignés par l’utilisateur de l’application pour générer et retourner un itinéraire.
+Les endpoints ppl_batch_x sont de type async combiné avec la commande await pour garantir un non blocage de l’api tout en attendant la fin de traitement avant de renvoyer la réponse de l’appel du endpoint.
 
 
