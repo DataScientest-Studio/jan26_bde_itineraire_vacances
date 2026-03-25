@@ -61,7 +61,7 @@ def ingest_data():
         # Vérification si une des clés a fonctionné
         if not response:
             print("🛑 ÉCHEC CRITIQUE : Toutes les clés API sont épuisées ou invalides.")
-            break
+            raise RuntimeError("Quotas API épuisés pour toutes les clés. Ingestion incomplète.")
 
         # 4. Traitement des données de la page
         data = response.json()
