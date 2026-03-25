@@ -1,15 +1,12 @@
-version: "3"
-
 # Cette première partie permet de créer le base commune aux services airflow, ce qui nous permet de ne pas nous répeter par la suite dans notre yml
 x-airflow-common: &airflow-common
   image: apache/airflow:2.8.1
   env_file:
     - .env
-  # On crée une ancre spécifique pour le dictionnaire environment car il sera réutilisé seulement dans un service
   environment: &airflow-common-env
     PYTHONUNBUFFERED: "1" # Permet d'avoir les logs en temps réel dans la console
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    # On va utiliser le service postgres qui existe déjà, pas besoin de recréer un service différent
+    # On va utiliser le service postgres qui existe déjà
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_postgres:5432/airflow_db
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__CORE__FERNET_KEY: ""
@@ -22,7 +19,7 @@ x-airflow-common: &airflow-common
     - ./airflow/plugins:/opt/airflow/plugins
   networks:
     - tourisme_network
-  user: "${AIRFLOW_UID:-50000}:0" # Standard
+  user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     db_postgres:
       condition: service_healthy

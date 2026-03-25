@@ -1,5 +1,5 @@
 from psycopg2.extras import RealDictCursor
-from scripts.utils.db_connect import get_pg_conn
+from scripts.utils.db_connect import get_pg_conn_api
 
 
 
@@ -7,7 +7,7 @@ def enrich_pois_with_postgres(poi_ids):
     if not poi_ids:
         return {}
 
-    conn = get_pg_conn()
+    conn = get_pg_conn_api()
     
     # On utilise ANY() pour interroger tous les UUIDs nécessaires en un seul aller-retour
     query = """
