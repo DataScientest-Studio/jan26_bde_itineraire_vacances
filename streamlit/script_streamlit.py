@@ -412,34 +412,35 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
         st.write("##")
         
     # Affichage de l'itinéraire détaillé
+    # Affichage de l'itinéraire détaillé
     st.markdown("<h3 style='margin-bottom: 30px;'>Votre itinéraire détaillé</h3>", unsafe_allow_html=True)
     
-    total_pois = sum(len(day.get("steps", [])) for day in itineraire)
-    if total_pois < st.session_state.get('duree', 1) and total_pois > 0:
-        st.info(f":material/info: **Note** : Seulement **{total_pois} activités** correspondent à vos critères.", icon=":material/tips_and_updates:")
+    # 1. On extrait UNIQUEMENT les vrais POIs pour avoir le compte exact
+    toutes_activites = [s for d in itineraire for s in d.get("steps", []) if s.get("type") == "poi"]
+    vrai_total_pois = len(toutes_activites)
+    nb_jours_demandes = st.session_state.get('duree', 1)
 
-    if not itineraire:
+    if vrai_total_pois == 0:
         st.warning("L'itinéraire a été généré, mais il est vide, 0 POI trouvés.")
         itineraire_a_afficher = []
     else:
-        # Affichage timeline verticale
-        # Si peu d'activités, on regroupe tout sur une journée pour éviter les journées vides
-        # Extraction de tous les POI pour le calcul de densité
-        toutes_activites = [s for d in itineraire for s in d.get("steps", []) if s.get("type") == "poi"]
-        total_pois = len(toutes_activites)
-        nb_jours_demandes = st.session_state.get('duree', 1)
-
-        if total_pois <= 4 and nb_jours_demandes > 1:
+        # LOGIQUE : On regroupe sur le Jour 1 SI :
+        # - On a moins de POIs que de jours (ex: 2 POIs pour 3 jours)
+        # - OU on a <= 4 POIs pour un séjour > 1 jour
+        if (vrai_total_pois < nb_jours_demandes or vrai_total_pois <= 4) and nb_jours_demandes > 1:
             steps_finaux = []
-            if total_pois > 1:
-                steps_finaux.append(toutes_activites[0])
-                if len(toutes_activites) > 1: steps_finaux.append(toutes_activites[1])
-                steps_finaux.append({"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"})
-                if len(toutes_activites) > 2: steps_finaux.extend(toutes_activites[2:])
+            if vrai_total_pois <= 2:
+                # 1 ou 2 POIs : Pas de pause dej
+                steps_finaux = toutes_activites 
             else:
-                steps_finaux = toutes_activites
+                # 3 ou 4 POIs : On injecte la pause dej au milieu
+                steps_finaux.append(toutes_activites[0])
+                steps_finaux.append(toutes_activites[1])
+                steps_finaux.append({"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"})
+                steps_finaux.extend(toutes_activites[2:])
+                
             itineraire_a_afficher = [{"day": 1, "steps": steps_finaux}]
-            st.info(f" **Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{total_pois} activités** sur la période demandée.", icon=":material/info:")
+            st.info(f"**Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{vrai_total_pois} activités** sur la période demandée.", icon=":material/info:")
         else:
             itineraire_a_afficher = itineraire
             st.success("Votre itinéraire est prêt !", icon=":material/celebration:")
@@ -454,9 +455,11 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
         
         if len(pois_only) == 1:
             steps_list = pois_only
-            grille_horaire = ["10:00"] # 1 seul POI = 10h et pas de déjeuner
+            grille_horaire = ["10:00"]
+        elif len(pois_only) == 2:
+            steps_list = pois_only
+            grille_horaire = ["08:00", "10:00"]
         else:
-            # Plusieurs POIs = On force la pause déjeuner à l'index 2 (12h00)
             steps_list = pois_only[:2] + [{"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"}] + pois_only[2:]
             grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
 
