@@ -424,23 +424,30 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
         st.warning("L'itinéraire a été généré, mais il est vide, 0 POI trouvés.")
         itineraire_a_afficher = []
     else:
-        # LOGIQUE : On regroupe sur le Jour 1 SI :
-        # - On a moins de POIs que de jours (ex: 2 POIs pour 3 jours)
-        # - OU on a <= 4 POIs pour un séjour > 1 jour
-        if (vrai_total_pois < nb_jours_demandes or vrai_total_pois <= 4) and nb_jours_demandes > 1:
-            steps_finaux = []
-            if vrai_total_pois <= 2:
-                # 1 ou 2 POIs : Pas de pause dej
-                steps_finaux = toutes_activites 
-            else:
-                # 3 ou 4 POIs : On injecte la pause dej au milieu
-                steps_finaux.append(toutes_activites[0])
-                steps_finaux.append(toutes_activites[1])
-                steps_finaux.append({"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"})
-                steps_finaux.extend(toutes_activites[2:])
+        # LOGIQUE STRICTE : 1 jour = 4 POIs.
+        # Si le total de POIs ne permet pas de remplir les jours demandés (4 par jour), on tasse !
+        if vrai_total_pois < (nb_jours_demandes * 4):
+            itineraire_a_afficher = []
+            
+            # On découpe TOUTE la liste brute en blocs stricts de 4 POIs
+            for i in range(0, vrai_total_pois, 4):
+                jour_index = (i // 4) + 1
+                activites_jour = toutes_activites[i:i+4]
                 
-            itineraire_a_afficher = [{"day": 1, "steps": steps_finaux}]
-            st.info(f"**Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{vrai_total_pois} activités** sur la période demandée.", icon=":material/info:")
+                steps_finaux = []
+                if len(activites_jour) <= 2:
+                    # 1 ou 2 POIs : Pas de pause dejeuner
+                    steps_finaux = activites_jour
+                else:
+                    # 3 ou 4 POIs : On injecte la pause dejeuner au milieu (après le 2ème POI)
+                    steps_finaux.append(activites_jour[0])
+                    steps_finaux.append(activites_jour[1])
+                    steps_finaux.append({"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"})
+                    steps_finaux.extend(activites_jour[2:])
+                    
+                itineraire_a_afficher.append({"day": jour_index, "steps": steps_finaux})
+            
+            st.info(f"**Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{vrai_total_pois} activités** pour vos {nb_jours_demandes} jours. Nous les avons regroupées pour optimiser votre temps.", icon=":material/info:")
         else:
             itineraire_a_afficher = itineraire
             st.success("Votre itinéraire est prêt !", icon=":material/celebration:")
