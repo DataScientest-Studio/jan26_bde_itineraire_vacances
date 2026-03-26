@@ -212,8 +212,8 @@ if st.session_state.step >= 2 and st.session_state.step != 5:
     
     col_slider, col_vide = st.columns([1, 1]) 
     with col_slider:
-        duree = st.select_slider("Durée (jours)", options=[1, 2, 3, 4, 5, 6, 7], value=3, label_visibility="collapsed")
-    
+        duree = st.select_slider("Durée (jours)", options=[1, 2, 3, 4, 5, 6], value=3, label_visibility="collapsed")
+
     st.write(f"Vous avez choisi de partir : <span style='background-color:#FFF0ED; color:#FF4500; padding:4px 10px; border-radius:8px; font-size:0.9rem; font-weight:bold;'>{duree} {'jour' if duree == 1 else 'jours'}</span>", unsafe_allow_html=True)
     st.write("##")
     
@@ -242,12 +242,23 @@ if st.session_state.step >= 3 and st.session_state.step != 5:
     if st.button("Générer mon itinéraire de voyage :material/travel:", type="primary", key="gen_final"):
         st.session_state.thematique = thematique
 
-        with st.spinner("Itinego s'occupe de tout..."):
-            info_place = st.empty() 
-            for p in ["Localisation des meilleurs spots...", "Optimisation du trajet...", "Touche finale..."]:
-                info_place.write(f"_{p}_") 
-                time.sleep(1.0)
-            info_place.empty()
+        with st.spinner("Itinégo calcule votre voyage..."):
+            zone_animation = st.empty()
+            
+            messages_chargement = [
+                ":material/search: **Localisation** des pépites locales...",
+                ":material/architecture: **Calcul** de l'itinéraire optimal...",
+                ":material/map: **Tracé** de votre carnet de voyage...",
+                ":material/auto_awesome: **Personnalisation** de l'expérience..."
+            ]
+
+            for _ in range(2): 
+                for msg in messages_chargement:
+                    zone_animation.markdown(f"*{msg}*")
+                    time.sleep(0.7) # Vitesse de l'alternance
+            
+            zone_animation.markdown(":material/sync: **Connexion** à l'intelligence Itinégo...")
+            
             
             # API
             try:
@@ -284,7 +295,7 @@ if st.session_state.step >= 3 and st.session_state.step != 5:
                         "http://api:8000/generer-itineraire", 
                         params=parametres,
                         headers=headers,
-                        timeout=15
+                        timeout=60
                     )
 
                     if reponse.status_code == 200:
@@ -357,91 +368,193 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
                 map_points.append({"lat": step["latitude"], "lon": step["longitude"], "label": step["label"]})
     
     if map_points:
+        import pydeck as pdk # Import mis ici pour aller plus vite
         df_map = pd.DataFrame(map_points)
         st.subheader(f"Exploration de {st.session_state.get('nom_ville_display', 'votre destination')}")
-        st.map(df_map, size=70, color='#FF4500', zoom=12)
+        
+        # Création des segments de lignes (Point A -> Point B)
+        df_lines = pd.DataFrame({
+            "start_lon": df_map["lon"].iloc[:-1].values,
+            "start_lat": df_map["lat"].iloc[:-1].values,
+            "end_lon": df_map["lon"].iloc[1:].values,
+            "end_lat": df_map["lat"].iloc[1:].values,
+        })
+
+        # Affichage de la carte avancée PyDeck
+        st.pydeck_chart(pdk.Deck(
+            map_style=None,
+            initial_view_state=pdk.ViewState(
+                latitude=df_map["lat"].mean(),
+                longitude=df_map["lon"].mean(),
+                zoom=13,
+                pitch=0,
+            ),
+            layers=[
+                # Les lignes (Le tracé)
+                pdk.Layer(
+                    "LineLayer",
+                    data=df_lines,
+                    get_source_position='[start_lon, start_lat]',
+                    get_target_position='[end_lon, end_lat]',
+                    get_color='[255, 69, 0, 150]', # Orange transparent
+                    get_width=4,
+                ),
+                # Les points (POI)
+                pdk.Layer(
+                    "ScatterplotLayer",
+                    data=df_map,
+                    get_position='[lon, lat]',
+                    get_color='[255, 69, 0, 255]', # Orange plein
+                    get_radius=80,
+                ),
+            ],
+        ))
         st.write("##")
         
     # Affichage de l'itinéraire détaillé
-    st.markdown("### Votre itinéraire détaillé")
+    st.markdown("<h3 style='margin-bottom: 30px;'>Votre itinéraire détaillé</h3>", unsafe_allow_html=True)
     
+    total_pois = sum(len(day.get("steps", [])) for day in itineraire)
+    if total_pois < st.session_state.get('duree', 1) and total_pois > 0:
+        st.info(f":material/info: **Note** : Seulement **{total_pois} activités** correspondent à vos critères.", icon=":material/tips_and_updates:")
+
     if not itineraire:
-        st.warning("⚠️ L'itinéraire a été généré, mais il est vide (0 POI).")
+        st.warning("L'itinéraire a été généré, mais il est vide, 0 POI trouvés.")
+        itineraire_a_afficher = []
     else:
         # Affichage timeline verticale
-        for day in itineraire:
-            with st.container(border=True):
-                html_day = f"<h4 style='color:#111827; margin-bottom: 20px; display: flex; align-items: center;'><span class='material-icons-round' style='margin-right: 8px; color:#FF4500;'>calendar_month</span> JOUR {day['day']}</h4>"
+        # Si peu d'activités, on regroupe tout sur une journée pour éviter les journées vides
+        # Extraction de tous les POI pour le calcul de densité
+        toutes_activites = [s for d in itineraire for s in d.get("steps", []) if s.get("type") == "poi"]
+        total_pois = len(toutes_activites)
+        nb_jours_demandes = st.session_state.get('duree', 1)
+
+        if total_pois <= 4 and nb_jours_demandes > 1:
+            steps_finaux = []
+            if total_pois > 1:
+                steps_finaux.append(toutes_activites[0])
+                if len(toutes_activites) > 1: steps_finaux.append(toutes_activites[1])
+                steps_finaux.append({"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"})
+                if len(toutes_activites) > 2: steps_finaux.extend(toutes_activites[2:])
+            else:
+                steps_finaux = toutes_activites
+            itineraire_a_afficher = [{"day": 1, "steps": steps_finaux}]
+            st.info(f" **Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{total_pois} activités** sur la période demandée.", icon=":material/info:")
+        else:
+            itineraire_a_afficher = itineraire
+            st.success("Votre itinéraire est prêt !", icon=":material/celebration:")
+        
+    for day in itineraire_a_afficher:
+        raw_steps = day.get("steps", [])
+        if not raw_steps:
+            continue
+
+        # FILTRE : On extrait les POIs purs et on gère la pause/horaire
+        pois_only = [pt for pt in raw_steps if pt.get("event_id") != "LUNCH_BREAK" and pt.get("type") != "pause"]
+        
+        if len(pois_only) == 1:
+            steps_list = pois_only
+            grille_horaire = ["10:00"] # 1 seul POI = 10h et pas de déjeuner
+        else:
+            # Plusieurs POIs = On force la pause déjeuner à l'index 2 (12h00)
+            steps_list = pois_only[:2] + [{"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"}] + pois_only[2:]
+            grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
+
+        with st.expander(f"**JOUR {day.get('day', 1)}**", expanded=True, icon=":material/calendar_month:"):
+            html_day = "<div style='padding-top: 40px;'>"
+
+            for idx, pt in enumerate(steps_list):
+                heure = grille_horaire[idx] if idx < len(grille_horaire) else "18:00"
+                is_lunch = pt.get("event_id") == "LUNCH_BREAK" or pt.get("type") == "pause"
+                is_last = (idx == len(steps_list) - 1)
                 
-                steps_list = day.get("steps", [])
-                grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00"]
+                # Logique de distance pour les badges
+                distance_badge = ""
+                css_b = "position: absolute; left: 63px; top: -30px; transform: translateX(-50%); background-color: white; border-radius: 10px; padding: 2px 7px; font-size: 0.65rem; font-weight: bold; z-index: 10; white-space: nowrap;"
+                
+                if idx == 0:
+                    # Toujours le départ au début
+                    distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Début itinéraire</div>"
+                
+                # Condition : Pas de badge si c'est un repas (is_lunch)
+                elif not is_lunch and "distance_m" in pt:
+                    dist_m = pt["distance_m"]
+                    # Affichage même si 0m
+                    txt = f"{dist_m / 1000:.1f} km" if dist_m >= 1000 else f"{int(dist_m)} m"
+                    distance_badge = f"<div style='{css_b} border: 1px solid #E2E8F0; color: #6B7280;'>↓ {txt}</div>"
 
-                for idx, pt in enumerate(steps_list):
-                    # On récupère l'heure selon la position (idx) dans la liste
-                    # S'il y a plus de 5 étapes, on met 18:00 par défaut
-                    grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00"]
+                line_html = "" if is_last else "<div style='position: absolute; left: 63px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.2;'></div>"
+                
+                if is_lunch:
+                    icon_h = "<span class='material-icons-round' style='color: #FF4500; font-size: 1.2rem; margin-top: 2px;'>restaurant</span>"
+                    desc_h = "" 
+                else:
+                    icon_h = "<div style='width: 12px; height: 12px; background-color: #FF4500; border-radius: 50%; margin: 8px auto 0 auto;'></div>"
+                    adr, tel, web, desc = pt.get("address"), pt.get("phone") or pt.get("telephone"), pt.get("website"), pt.get("description")
+                    
+                    contact_elements = []
+                    if adr and str(adr).lower() != "none":
+                            adr_display = adr[:120] + "..." if len(adr) > 120 else adr
+                            q = f"{pt.get('label','')} {adr} {st.session_state.get('nom_ville_display','')}".replace(" ", "+")
+                            u = f"https://www.google.com/maps/search/?api=1&query={q}"
+                            contact_elements.append(f"<a href='{u}' target='_blank' style='text-decoration: underline;'><span class='material-icons-round' style='font-size: 0.9rem; vertical-align: middle;'>place</span> {adr_display}</a>")
+                    if tel and str(tel).lower() != "none": contact_elements.append(f"<span class='material-icons-round' style='font-size: 0.9rem; vertical-align: middle;'>call</span> {tel}")
+                    if web and str(web).lower() != "none": contact_elements.append(f"<a href='{web}' target='_blank' style='color:#FF4500; text-decoration:none;'><span class='material-icons-round' style='font-size: 0.9rem; vertical-align: middle;'>language</span> Site Web</a>")
+                    
+                    info_l = f"<div style='font-size: 0.8rem; color: #6B7280; margin-top: 4px;'>{' • '.join(contact_elements)}</div>" if contact_elements else ""
+                    det = f"<details open style='margin-top: 8px; cursor: pointer;'><summary style='font-size: 0.8rem; color: #6B7280;'>Description ...</summary><p style='font-size: 0.85rem; color: #4B5563; margin-top: 5px; line-height: 1.4;'>{desc}</p></details>" if desc and str(desc).lower() != "none" else ""
+                    desc_h = f"{info_l}{det}<div style='margin-top: 2px;'><span style='color: #FF4500; font-weight: bold; font-size: 0.8rem;'>⏱ 2h</span></div>"
+                
+                margin_val = "30px" if is_lunch else "0px"
+                html_day += f"<div style='display: flex; position: relative; margin-bottom: {margin_val};'>{line_html}{distance_badge}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{heure}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon_h}</div><div style='flex: 1; padding-bottom: 35px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_h}</div></div>"
+            
+            html_day += "</div>"
+            st.markdown(html_day, unsafe_allow_html=True)
 
-                for idx, pt in enumerate(steps_list):
-                    heure = grille_horaire[idx] if idx < len(grille_horaire) else "18:00"
-                    is_lunch = pt.get("event_id") == "LUNCH_BREAK" 
-                    is_last = (idx == len(steps_list) - 1)
-                    
-                    # Ligne verticale de la timeline (sauf pour le dernier point)
-                    line_html = "" if is_last else "<div style='position: absolute; left: 63px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.2;'></div>"
-                    time_display = "" if is_lunch else f"{heure}"
-                    icon_name = "restaurant" if is_lunch else "location_on"
-                    icon = f"<span class='material-icons-round' style='color: #FF4500; font-size: 1.3rem;'>{icon_name}</span>"
-                    
-                    # Détails du POI (ou du déjeuner)
-                    if is_lunch:
-                        desc_html = "<p style='color: #6B7280; font-size: 0.85rem; margin: 0;'>Pause déjeuner • <b>2h</b></p>"
-                    else:
-                        # Récupération des infos du POI avec des valeurs par défaut si elles sont manquantes
-                        adr = pt.get("address", "Adresse non dispo")
-                        tel = pt.get("telephone", "")
-                        web = pt.get("website", "")
-                        desc = pt.get("description", "Aucune description.")
-                        
-                        # Ligne de contact style Maps
-                        contact_info = f"📍 {adr}"
-                        if tel: contact_info += f" • 📞 {tel}"
-                        if web: contact_info += f" • <a href='{web}' target='_blank' style='color:#FF4500; text-decoration:none;'>🌐 Site Web</a>"
-                        
-                        # Assemblage final de la description du POI
-                        desc_html = f"""
-                            <div style='font-size: 0.8rem; color: #6B7280; margin-top: 4px;'>{contact_info}</div>
-                            <div style='margin-top: 6px;'><span style='color: #FF4500; font-weight: bold; font-size: 0.8rem;'>⏱ 2h</span></div>
-                            <details style='margin-top: 8px; cursor: pointer;'>
-                                <summary style='font-size: 0.8rem; color: #FF4500; font-weight: bold;'>En savoir plus...</summary>
-                                <p style='font-size: 0.85rem; color: #4B5563; margin-top: 5px; line-height: 1.4;'>{desc}</p>
-                            </details>
-                        """
-                    
-                    # Html final de la ligne de l'étape (avec la timeline, l'icône, le titre et les détails)
-                    html_day += f"<div style='display: flex; position: relative; margin-bottom: 0px;'>{line_html}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{time_display}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon}</div><div style='flex: 1; padding-bottom: 25px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_html}</div></div>"
-                st.markdown(html_day, unsafe_allow_html=True)
-
-    st.success("Votre itinéraire personnalisé est prêt !")
-    st.write("##")
 
     # Vérification si l'itinéraire actuel a déjà été sauvé durant cette vue
     if st.session_state.get('last_saved') == st.session_state.ville:
         st.markdown("<p style='font-weight: 800; margin-bottom: 0;'>Itinéraire enregistré !</p>", unsafe_allow_html=True)
-        
-        # Lien clique acces aux favoris
-        if st.button("Voir mes favoris", type="tertiary"):
+
+        st.markdown("""
+            <style>
+            div.stButton > button[key="link_fav_button"] {
+                color: black !important;
+                text-decoration: none !important;
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                font-weight: normal !important;
+                font-size: 1rem !important; /* Pour que ça ressemble à du texte */
+                margin-top: 10px !important; /* Espacement après le texte "Itinéraire enregistré !" */
+            }
+            div.stButton > button[key="link_fav_button"]:hover {
+                text-decoration: underline !important;
+                color: black !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        # Lien clique acces aux favoris (avec clé unique pour le style)
+        if st.button("Voir mes favoris", key="link_fav_button"):
             st.session_state.step = 5
             st.rerun()
     else:
         
         if st.button("❤️ Enregistrer dans mes favoris", use_container_width=True):
             mes_favoris = localS.getItem("mes_favoris_itinego") or []
+
+            # Récupération du nom de la ville pour le titre
+            # On utilise .get() pour sécuriser au cas où la variable n'est pas définie
+            nom_ville = st.session_state.get('nom_ville_display', st.session_state.ville)
+
             nouveau_favori = {
                 "id": int(time.time()),
-                "nom": f"Itinéraire pour {st.session_state.ville}",
+                "nom": f"Itinéraire pour {nom_ville}",
                 "data": st.session_state.data_voyage
             }
             mes_favoris.append(nouveau_favori)
+
             localS.setItem("mes_favoris_itinego", mes_favoris)
             
             # Mémorise que c'est sauvé pour changer l'affichage
@@ -482,49 +595,71 @@ if st.session_state.step == 5:
         st.write("---")
         
         # Affichage de l'itinéraire en colonne unique
-        grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00"]
-        
+        # Affichage de l'itinéraire avec la même logique métier que l'étape 4
         for day in itineraire_fav:
-            with st.container(border=True):
-                html_day = f"<h4 style='color:#111827; margin-bottom: 25px;'>JOUR {day['day']}</h4>"
-                steps_list = day.get("steps", [])
-                
-                for idx, pt in enumerate(steps_list):
-                    # Logique horaire
-                    heure = grille_horaire[idx] if idx < len(grille_horaire) else "18:00"
-                    is_lunch = pt.get("event_id") == "LUNCH_BREAK"
-                    is_last = (idx == len(steps_list) - 1)
-                    time_display = "" if is_lunch else heure
-                    icon_name = "restaurant" if is_lunch else "location_on"
-                    
-                    # Détails (Assemblage compact pour éviter le bug Markdown)
-                    if is_lunch:
-                        detail_html = "<p style='color: #6B7280; font-size: 0.85rem; margin: 0;'>Pause déjeuner • <b>2h</b></p>"
-                    else:
-                        adr, tel, web, desc = pt.get("address", "N/A"), pt.get("telephone", ""), pt.get("website", ""), pt.get("description", "")
-                        contact_row = f"📍 {adr}"
-                        if tel: contact_row += f" • 📞 {tel}"
-                        if web: contact_row += f" • <a href='{web}' target='_blank' style='color:#FF4500; text-decoration:none;'>🌐 Site</a>"
-                        
-                        detail_html = (
-                            f"<div style='font-size: 0.8rem; color: #6B7280; margin-top: 4px;'>{contact_row}</div>"
-                            f"<div style='margin-top: 6px;'><span style='color: #FF4500; font-weight: bold; font-size: 0.8rem;'>⏱ 2h</span></div>"
-                            f"<details style='margin-top: 8px; cursor: pointer;'><summary style='font-size: 0.8rem; color: #FF4500; font-weight: bold;'>En savoir plus...</summary>"
-                            f"<p style='font-size: 0.85rem; color: #4B5563; margin-top: 5px; line-height: 1.4;'>{desc}</p></details>"
-                        )
+            raw_steps = day.get("steps", [])
+            if not raw_steps:
+                continue
 
-                    # Construction de la ligne Timeline 
-                    line_css = "" if is_last else "<div style='position: absolute; left: 68px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.1;'></div>"
+            # FILTRE : On extrait les POIs purs et on gère la pause/horaire
+            pois_only = [pt for pt in raw_steps if pt.get("event_id") != "LUNCH_BREAK" and pt.get("type") != "pause"]
+            
+            if len(pois_only) == 1:
+                steps_list = pois_only
+                grille_horaire = ["10:00"]
+            else:
+                steps_list = pois_only[:2] + [{"type": "pause", "label": "Pause déjeuner", "event_id": "LUNCH_BREAK"}] + pois_only[2:]
+                grille_horaire = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
+
+            with st.expander(f"**JOUR {day.get('day', 1)}**", expanded=True, icon=":material/calendar_month:"):
+                html_day = "<div style='padding-top: 40px;'>"
+
+                for idx, pt in enumerate(steps_list):
+                    heure = grille_horaire[idx] if idx < len(grille_horaire) else "18:00"
+                    is_lunch = pt.get("event_id") == "LUNCH_BREAK" or pt.get("type") == "pause"
+                    is_last = (idx == len(steps_list) - 1)
                     
-                    html_day += (
-                        f"<div style='display: flex; position: relative; margin-bottom: 5px;'>"
-                        f"{line_css}"
-                        f"<div style='width: 50px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{time_display}</div>"
-                        f"<div style='width: 35px; text-align: center; margin-left: 10px; margin-right: 10px;'><span class='material-icons-round' style='color: #FF4500; font-size: 1.2rem;'>{icon_name}</span></div>"
-                        f"<div style='flex: 1; padding-bottom: 30px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{detail_html}</div>"
-                        f"</div>"
-                    )
+                    # Logique de distance pour les badges
+                    distance_badge = ""
+                    css_b = "position: absolute; left: 63px; top: -30px; transform: translateX(-50%); background-color: white; border-radius: 10px; padding: 2px 7px; font-size: 0.65rem; font-weight: bold; z-index: 10; white-space: nowrap;"
+                    
+                    if idx == 0:
+                        distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Début itinéraire</div>"
+                    elif not is_lunch and "distance_m" in pt:
+                        dist_m = pt["distance_m"]
+                        txt = f"{dist_m / 1000:.1f} km" if dist_m >= 1000 else f"{int(dist_m)} m"
+                        distance_badge = f"<div style='{css_b} border: 1px solid #E2E8F0; color: #6B7280;'>↓ {txt}</div>"
+
+                    line_html = "" if is_last else "<div style='position: absolute; left: 63px; top: 25px; bottom: 0px; width: 2px; background-color: #FF4500; opacity: 0.2;'></div>"
+                    
+                    if is_lunch:
+                        icon_h = "<span class='material-icons-round' style='color: #FF4500; font-size: 1.2rem; margin-top: 2px;'>restaurant</span>"
+                        desc_h = "" 
+                    else:
+                        icon_h = "<div style='width: 12px; height: 12px; background-color: #FF4500; border-radius: 50%; margin: 8px auto 0 auto;'></div>"
+                        adr, tel, web, desc = pt.get("address"), pt.get("phone") or pt.get("telephone"), pt.get("website"), pt.get("description")
+                        
+                        contact_elements = []
+
+                        if adr and str(adr).lower() != "none":
+                            adr_display = adr[:120] + "..." if len(adr) > 120 else adr
+                            q = f"{pt.get('label','')} {adr} {st.session_state.get('nom_ville_display','')}".replace(" ", "+")
+                            u = f"https://www.google.com/maps/search/?api=1&query={q}"
+                            contact_elements.append(f"<a href='{u}' target='_blank' style='text-decoration: underline;'><span class='material-icons-round' style='font-size: 0.9rem; vertical-align: middle;'>place</span> {adr_display}</a>")
+
+                        if tel and str(tel).lower() != "none": 
+                            contact_elements.append(f"<span class='material-icons-round' style='font-size: 0.9rem; vertical-align: middle;'>call</span> {tel}")
+                        if web and str(web).lower() != "none": 
+                            contact_elements.append(f"<a href='{web}' target='_blank' style='color:#FF4500; text-decoration:none;'><span class='material-icons-round' style='font-size: 0.9rem; vertical-align: middle;'>language</span> Site Web</a>")
+                        
+                        info_l = f"<div style='font-size: 0.8rem; color: #6B7280; margin-top: 4px;'>{' • '.join(contact_elements)}</div>" if contact_elements else ""
+                        det = f"<details open style='margin-top: 8px; cursor: pointer;'><summary style='font-size: 0.8rem; color: #6B7280;'>Description ...</summary><p style='font-size: 0.85rem; color: #4B5563; margin-top: 5px; line-height: 1.4;'>{desc}</p></details>" if desc and str(desc).lower() != "none" else ""
+                        desc_h = f"{info_l}{det}<div style='margin-top: 2px;'><span style='color: #FF4500; font-weight: bold; font-size: 0.8rem;'>⏱ 2h</span></div>"
+                    
+                    margin_val = "30px" if is_lunch else "0px"
+                    html_day += f"<div style='display: flex; position: relative; margin-bottom: {margin_val};'>{line_html}{distance_badge}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{heure}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon_h}</div><div style='flex: 1; padding-bottom: 35px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_h}</div></div>"
                 
+                html_day += "</div>"
                 st.markdown(html_day, unsafe_allow_html=True)
 
     # Sous-étape : Liste des favoris
