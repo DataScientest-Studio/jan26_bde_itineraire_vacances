@@ -448,7 +448,7 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
                     
                 itineraire_a_afficher.append({"day": jour_index, "steps": steps_finaux})
             
-            st.info(f"**Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{vrai_total_pois} activités** pour vos **{nb_jours_demandes} jours**. Nous les avons regroupées pour optimiser votre temps.", icon=":material/info:")
+            st.info(f"**Info** : Itinéraire généré avec succès. Cependant, nous n'avons trouvé que **{vrai_total_pois} activités** pour vos {nb_jours_demandes} jours. Nous les avons regroupées pour optimiser votre temps.", icon=":material/info:")
         else:
             itineraire_a_afficher = itineraire
             st.success("Votre itinéraire est prêt !", icon=":material/celebration:")
