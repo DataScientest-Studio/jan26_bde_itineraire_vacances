@@ -1,4 +1,4 @@
-# Itinéraire de Vacances
+# Projet Itinéraire de Vacances
 
 <p align="left">
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
@@ -31,7 +31,7 @@ Les flux de données pipeline sont orchestrés via **Airflow** et la consommatio
 
 ![Schéma Architecture UML](img/diagramme_UML.png)
 
-> **Note** : Ce schéma illustre le flux de données depuis l'ingestion brute jusqu'à la consommation finale par l'utilisateur.
+> _**Note** : Ce schéma illustre le flux de données depuis l'ingestion brute jusqu'à la consommation finale par l'utilisateur._
 
 
 
@@ -214,4 +214,4 @@ L'interface communique directement avec l'**API FastAPI** pour offrir une expér
 
 **Exemple d'itinéraire généré :**
 
-![Exemple Itinéraire](img/demo_resultat.svg)
+![Exemple Itinéraire](img/demo_resultat.png)
