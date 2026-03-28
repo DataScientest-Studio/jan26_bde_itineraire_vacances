@@ -64,6 +64,7 @@ st.session_state.max_step = max(st.session_state.max_step, st.session_state.step
 # 2. SIDEBAR : Menu de navigation 
 
 with st.sidebar:
+    
     st.title("Sommaire")
     st.write("---")
 
@@ -126,7 +127,6 @@ st.markdown("""
     .step-header-red { color: #FF4500; font-size: 2.5rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
     [data-testid="stSidebar"] { background-color: #F8FAFC; border-right: 1px solid #E2E8F0; }
     [data-testid="stSidebar"] a { text-decoration: none; color: #4B5563 !important; }
-    h1 { font-family: 'Polymath', sans-serif !important; font-weight: 800 !important; letter-spacing: -1px !important; color: #111827 !important; }
     button[kind="primary"] { background: linear-gradient(135deg, #FF6B4B 0%, #FF8E3C 100%) !important; border: none !important; color: white !important; font-weight: 700 !important; padding: 12px 30px !important; border-radius: 12px !important; transition: 0.3s !important; }
     </style>
     <div class="top-bar"></div>
@@ -136,9 +136,10 @@ st.markdown("""
 # ÉTAPE 0 : Page d'accueil
 
 if st.session_state.step == 0:
-    st.markdown("<h1 style='text-align: center; font-size: 4rem;'>Itinégo</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center; color: #4B5563;'>Votre assistant de voyage personnalisé</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center;'>Planifiez votre itinéraire de voyage en seulement quelques clics...</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 3.5rem;'>Itinégo</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #4B5563; font-weight: 500; margin-top: -10px;'>Votre assistant de voyage personnalisé</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 1.1rem; margin-top: 15px;'>Planifiez votre itinéraire de voyage en quelques clics seulement...</p>", unsafe_allow_html=True)
+    
     
     st.write("##")
     st.write("##")
@@ -180,7 +181,7 @@ if st.session_state.step >= 1 and st.session_state.step != 5:
         options=villes_db, 
         format_func=lambda x: f"{x['city']} ({x['postalcodeinsee']})", 
         index=None, 
-        placeholder="Commencez à taper (ex: Paris...)", 
+        placeholder="Tapez le nom d'une ville ou le code postal...", 
         label_visibility="collapsed"
     )
     alerte_ville = st.empty()
@@ -234,7 +235,7 @@ if st.session_state.step >= 3 and st.session_state.step != 5:
         components.html("<script>window.parent.document.getElementById('cible-etape-3').scrollIntoView({behavior: 'smooth'});</script>", height=0)
 
     st.markdown('<p style="color:#FF4500; font-weight:800; font-size:1.2rem; margin-bottom:0;">ÉTAPE 3</p>', unsafe_allow_html=True)
-    st.subheader("Quels sont vos centres d'intérêt ?")
+    st.subheader("Quel est le thème de votre voyage ?")
 
     thematique = st.pills("Sélectionnez une thématique pour votre voyage :", options=["Culture", "Sport", "Gastronomie", "En famille", "Bien-être/Relaxation"], selection_mode="single", default="Culture")
     st.write("##")
@@ -412,7 +413,6 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
         st.write("##")
         
     # Affichage de l'itinéraire détaillé
-    # Affichage de l'itinéraire détaillé
     st.markdown("<h3 style='margin-bottom: 30px;'>Votre itinéraire détaillé</h3>", unsafe_allow_html=True)
     
     # 1. On extrait UNIQUEMENT les vrais POIs pour avoir le compte exact
@@ -425,7 +425,7 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
         itineraire_a_afficher = []
     else:
         # LOGIQUE STRICTE : 1 jour = 4 POIs.
-        # Si le total de POIs ne permet pas de remplir les jours demandés (4 par jour), on tasse !
+        # Si le total de POIs ne permet pas de remplir les jours demandés (4 par jour), on tasse .
         if vrai_total_pois < (nb_jours_demandes * 4):
             itineraire_a_afficher = []
             
@@ -436,6 +436,7 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
                 
                 steps_finaux = []
                 if len(activites_jour) <= 2:
+
                     # 1 ou 2 POIs : Pas de pause dejeuner
                     steps_finaux = activites_jour
                 else:
@@ -452,7 +453,9 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
             itineraire_a_afficher = itineraire
             st.success("Votre itinéraire est prêt !", icon=":material/celebration:")
         
-    for day in itineraire_a_afficher:
+    total_days_4 = len(itineraire_a_afficher)
+    for day_idx, day in enumerate(itineraire_a_afficher):
+        jour_num = day.get("day", day_idx + 1)
         raw_steps = day.get("steps", [])
         if not raw_steps:
             continue
@@ -483,8 +486,11 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
                 css_b = "position: absolute; left: 63px; top: -30px; transform: translateX(-50%); background-color: white; border-radius: 10px; padding: 2px 7px; font-size: 0.65rem; font-weight: bold; z-index: 10; white-space: nowrap;"
                 
                 if idx == 0:
-                    # Toujours le départ au début
-                    distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Début itinéraire</div>"
+                    # Badge de début ou "Itinéraire Jour X"
+                    if day_idx == 0:
+                        distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Début d'itinéraire</div>"
+                    else:
+                        distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Itinéraire Jour {jour_num}</div>"
                 
                 # Condition : Pas de badge si c'est un repas (is_lunch)
                 elif not is_lunch and "distance_m" in pt:
@@ -518,6 +524,10 @@ if st.session_state.step == 4 and "data_voyage" in st.session_state:
                 margin_val = "30px" if is_lunch else "0px"
                 html_day += f"<div style='display: flex; position: relative; margin-bottom: {margin_val};'>{line_html}{distance_badge}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{heure}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon_h}</div><div style='flex: 1; padding-bottom: 35px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_h}</div></div>"
             
+                # Pastille de fin pour le tout dernier POI du dernier jour
+                if is_last and (day_idx == total_days_4 - 1):
+                    html_day += f"<div style='position: relative; height: 30px;'><div style='position: absolute; left: 63px; top: -15px; transform: translateX(-50%); background-color: white; border-radius: 10px; padding: 2px 7px; font-size: 0.65rem; font-weight: bold; z-index: 10; white-space: nowrap; border: 1px solid #4F46E5; color: #4F46E5;'>Fin d'itinéraire</div></div>"
+
             html_day += "</div>"
             st.markdown(html_day, unsafe_allow_html=True)
 
@@ -606,7 +616,9 @@ if st.session_state.step == 5:
         
         # Affichage de l'itinéraire en colonne unique
         # Affichage de l'itinéraire avec la même logique métier que l'étape 4
-        for day in itineraire_fav:
+        total_days_5 = len(itineraire_fav)
+        for day_idx, day in enumerate(itineraire_fav):
+            jour_num = day.get("day", day_idx + 1)
             raw_steps = day.get("steps", [])
             if not raw_steps:
                 continue
@@ -634,7 +646,10 @@ if st.session_state.step == 5:
                     css_b = "position: absolute; left: 63px; top: -30px; transform: translateX(-50%); background-color: white; border-radius: 10px; padding: 2px 7px; font-size: 0.65rem; font-weight: bold; z-index: 10; white-space: nowrap;"
                     
                     if idx == 0:
-                        distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Début itinéraire</div>"
+                        if day_idx == 0:
+                            distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Début d'itinéraire</div>"
+                        else:
+                            distance_badge = f"<div style='{css_b} border: 1px solid #4F46E5; color: #4F46E5;'>Itinéraire Jour {jour_num}</div>"
                     elif not is_lunch and "distance_m" in pt:
                         dist_m = pt["distance_m"]
                         txt = f"{dist_m / 1000:.1f} km" if dist_m >= 1000 else f"{int(dist_m)} m"
@@ -669,6 +684,10 @@ if st.session_state.step == 5:
                     margin_val = "30px" if is_lunch else "0px"
                     html_day += f"<div style='display: flex; position: relative; margin-bottom: {margin_val};'>{line_html}{distance_badge}<div style='width: 45px; text-align: right; font-weight: bold; color: #4B5563; font-size: 0.95rem; padding-top: 3px;'>{heure}</div><div style='width: 30px; text-align: center; margin-left: 5px; margin-right: 5px;'>{icon_h}</div><div style='flex: 1; padding-bottom: 35px;'><div style='font-weight: bold; color: #111827; font-size: 1.05rem;'>{pt['label']}</div>{desc_h}</div></div>"
                 
+                    # Pastille de fin pour le tout dernier POI du dernier jour
+                    if is_last and (day_idx == total_days_5 - 1):
+                        html_day += f"<div style='position: relative; height: 30px;'><div style='position: absolute; left: 63px; top: -15px; transform: translateX(-50%); background-color: white; border-radius: 10px; padding: 2px 7px; font-size: 0.65rem; font-weight: bold; z-index: 10; white-space: nowrap; border: 1px solid #4F46E5; color: #4F46E5;'>Fin d'itinéraire</div></div>"
+
                 html_day += "</div>"
                 st.markdown(html_day, unsafe_allow_html=True)
 
