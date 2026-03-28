@@ -36,8 +36,10 @@ Les flux de données pipeline sont orchestrés via **Airflow** et la consommatio
 
 
 ## Démonstration de l'Application
-
-https://github.com/user-attachments/assets/7ba57b92-490e-4179-b750-496b3783cdf7
+<details>
+  <summary>Démonstration vidéo</summary>
+  <video src="https://github.com/user-attachments/assets/7ba57b92-490e-4179-b750-496b3783cdf7" width="600" controls></video>
+</details>
 
 
 ## Prérequis
