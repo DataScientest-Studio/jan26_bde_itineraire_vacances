@@ -165,6 +165,8 @@ services:
     hostname: airflow_webserver
     command: scheduler
     restart: always
+    depends_on:
+      - api
 
 networks:
   tourisme_network:
