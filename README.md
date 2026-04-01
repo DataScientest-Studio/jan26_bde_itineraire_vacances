@@ -47,7 +47,6 @@ Les flux de données pipeline sont orchestrés via **Airflow** et la consommatio
 Avant de commencer, assurez-vous d'avoir installé les outils suivants sur votre machine :
 *   [Docker](https://www.docker.com/get-started)
 *   [Docker Compose](https://docs.docker.com/compose/install/)
-*   [Python 3.9+](https://www.python.org/downloads/)
 
 ## Installation et Configuration
 
@@ -69,48 +68,26 @@ Suivez ces étapes pour mettre en place votre environnement de développement lo
     Ouvrez ensuite le fichier `.env` et **modifiez les variables**, notamment en ajoutant votre propre clé d'API pour `DATA_TOURISME_API_KEY`.
 
 3.  **Lancer les Services Docker :**
-    Démarrez les conteneurs des bases de données (MongoDB, PostgreSQL) et de l'outil d'administration (pgAdmin) en arrière-plan :
+    Démarrez l'ensemble des services (bases de données, API, Airflow, Streamlit) en arrière-plan :
     ```bash
     docker-compose up -d
     ```
+    Les conteneurs peuvent prendre quelques minutes pour s'initialiser complètement.
 
-4.  **Mettre en Place l'Environnement Python :**
-    Il est recommandé d'utiliser un environnement virtuel pour isoler les dépendances du projet.
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    ```
-    *Sur Windows, l'activation se fait avec : `.venv\Scripts\activate`*
+## Lancement du pipeline de données (Airflow)
 
+Une fois les services Docker démarrés, le pipeline de données complet peut être lancé depuis l'interface d'Airflow pour la première ingestion de données.
 
+1.  **Accéder à l'interface d'Airflow :**
+    Ouvrez votre navigateur et allez à l'adresse `http://localhost:8080`.
+    > **Note :** Le login et le mot de passe par défaut sont `airflow`.
 
-## Utilisation
+2.  **Activer et lancer le DAG :**
+    - Dans la liste des DAGs, trouvez le DAG nommé `full_tourisme_pipeline`.
+    - Activez-le en basculant l'interrupteur à gauche de son nom.
+    - Pour le lancer manuellement, cliquez sur le bouton "Play" (lecture) à droite du nom du DAG et sélectionnez "Trigger DAG".
 
-Une fois l'installation terminée, vous pouvez utiliser les scripts pour interagir avec les données.
-
-1.  **Ingestion des Données :**
-    Pour récupérer les données de la source "datatourisme" et les stocker dans MongoDB.
-    ```bash
-    python -m api.scripts.ingestion.ingest_datatourisme
-    ```
-    > **Note :** L'API `datatourisme` limite le nombre d'appels. Lors de la première exécution complète, il est possible que le script s'interrompe. Il faudra alors attendre environ 1 heure avant de le relancer pour terminer l'ingestion, ou configurer une seconde clé d'API dans le code.
-
-2.  **Traitement et Transfert des Données :**
-    Pour traiter les données depuis MongoDB et les transférer vers PostgreSQL.
-    ```bash
-    python -m api.scripts.processing.mongo_to_postgres
-    ```
-
-3.  **Catégorisation des POIs (Machine Learning) :**
-    Lancer la prédiction des thèmes des points d'intérêt (POIs).
-    ```bash
-    python -m api.scripts.ml.predict_all_pois
-    ```
-4.  **Ingestion des POIs sur Neo4j :**
-    Lancer le script.
-    ```bash
-    python -m api.scripts.neo4j_db.ingestion_neo4j.py
-    ```
+Le pipeline va alors exécuter toutes les étapes d'ingestion et de traitement des données. Vous pouvez suivre la progression en direct dans l'interface d'Airflow en cliquant sur le nom du DAG.
 
 
 
